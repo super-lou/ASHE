@@ -1,0 +1,10 @@
+Package: ASHE
+Version: 0.0.1
+Date: 2023-01-05
+Title: ASHE
+Description: ASHE
+Author: Louis Héraut <louis.heraut@inrae.fr>
+Maintainer: Louis Héraut <louis.heraut@inrae.fr>
+Encoding: UTF-8
+License: GPL-3
+RoxygenNote: 7.1.2

@@ -1,37 +1,23 @@
-# \\\
-# Copyright 2021-2022 Louis Héraut*1,
-#                     Éric Sauquet*2,
-#                     Valentin Mansanarez
+# Copyright 2021-2023 Louis Héraut (louis.heraut@inrae.fr)*1,
+#                     Éric Sauquet (eric.sauquet@inrae.fr)*1
 #
 # *1   INRAE, France
-#      louis.heraut@inrae.fr
-# *2   INRAE, France
-#      eric.sauquet@inrae.fr
 #
-# This file is part of ash R toolbox.
+# This file is part of ASHE R package.
 #
-# Ash R toolbox is free software: you can redistribute it and/or
+# ASHE R package is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# Ash R toolbox is distributed in the hope that it will be useful, but
+# ASHE R package is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ash R toolbox.
+# along with ASHE R package.
 # If not, see <https://www.gnu.org/licenses/>.
-# ///
-#
-#
-# R/processing/format.R
-#
-# Manages all the format problem of data and info. Mainly problem of
-# input and output of the 'StatsAnalysisTrend' package. It also allows
-# to join different selections of station and to gets exact period of
-# trend analysis.
 
 
 ## 1. FORMATTING OF DATA _____________________________________________
@@ -78,7 +64,6 @@ join_selection = function (list_data, list_meta, list_from) {
 }
 
 
-
 ## 3. FOLLOWING OF DATA MODIFICATIONS ________________________________
 #' @title Add modification info
 #' @export
@@ -100,3 +85,37 @@ add_mod = function (df_mod, Code, type, fun_name, comment, df_meta=NULL) {
     return (df_mod)
 }
 
+
+## 4. CRITICISM OF DATA ______________________________________________
+#' @title Add criticism
+#' @export
+add_critique = function (df_critique, Code, author, level, start_date, variable, type, comment='', end_date=NULL, df_meta=NULL, resdir=NULL) {
+    if (Code == 'all' & is.null(df_meta)) {
+        Code = NA # erreur
+    } else if (Code == 'all' & !is.null(df_meta)) {
+        # Get all different stations code
+        Code = rle(data$Code)$value
+    }
+
+    if (is.null(end_date)) {
+        end_date = start_date
+    }
+    
+    df_tmp = tibble(Code=Code, author=author, level=level,
+                    start_date=start_date, end_date=end_date,
+                    variable=variable, type=type,
+                    comment=comment)
+    df_critique = bind_rows(df_critique, df_tmp)
+
+    nc = nrow(df_critique)
+    print('Criticism registered')
+    print(df_critique[(nc-2):nc,])
+
+    if (!is.null(resdir)) {   
+        write_critique(df_critique, resdir)
+    }
+    
+    return (df_critique)
+}
+
+# df_critique = add_critique(df_critique, resdir=resdir, Code='', author='louis', level=, start_date=, end_date=NA, variable='', type='', comment='')
