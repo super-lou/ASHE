@@ -476,6 +476,12 @@ extract_meta = function (computer_data_path, filedir, filename,
                                         nchar(file_path)) != '/') {
         # Extract all the header
         metatxt = c(readLines(file_path, n=41, encoding="UTF-8"))
+
+
+        # print(metatxt[11])
+        # print(metatxt[12])
+        # print(metatxt[13])
+        # print("_________________")
         
         # Create a tibble with all the metadata needed
         # (IN for INRAE data and BH for BH data)
@@ -638,10 +644,10 @@ extract_data = function (computer_data_path, filedir, filename,
                                         nchar(file_path)) != '/') {
         # Extract the data as a data frame
         data = read.table(file_path,
-                             header=TRUE,
-                             na.strings=c('     -99', ' -99.000'),
-                             sep=';',
-                             skip=41)   
+                          header=TRUE,
+                          na.strings=c('     -99', ' -99.000'),
+                          sep=';',
+                          skip=41)
 
         # Extract all the metadata for the station
         df_meta = extract_meta(computer_data_path, filedir, filename,
@@ -650,10 +656,20 @@ extract_data = function (computer_data_path, filedir, filename,
         code = df_meta$Code
         # Create a tibble with the date as Date class and the code
         # of the station
+        
+        # colClasses = c("integer", "integer", "double",
+                       # "integer", "integer", "integer")
+        data = tibble(data)
+        for (j in 1:ncol(data)) {
+            if (is.factor(data[[j]])) {
+                data[j] = as.numeric(as.character(data[[j]]))
+            }
+        }
+        
         data = tibble(Date=as.Date(as.character(data$Date),
-                                      format="%Y%m%d"),
-                         Q=data$Qls * 1E-3,
-                         Code=code)
+                                   format="%Y%m%d"),
+                      Q=data$Qls * 1E-3,
+                      Code=code)
         return (data)
 
     } else {
