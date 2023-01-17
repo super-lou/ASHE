@@ -20,6 +20,42 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 
+
+### 2.3. FDC _______________________________________________________
+#' @title fdc_values
+#' @description Given a vector of streamflow values, computes a
+#' data.frame with two columns : a 'p' column containing the
+#' probability of exceedance and a 'Q' column containing the
+#' corresponding streamflow values. Two methods can be used : simply
+#' sorting the data (not recommended) or using the quantile function.
+#' @param Q Streamflow vector
+#' @param n number of rows in the resulting data.frame (should be
+#' smaller than the length of 'Q'.
+#' @param sort logical. Should the sort function be used instead
+#' of the quantile function ?
+#' @param na.rm logical. Should the missing values be ignored ? (must
+#' be TRUE if the quantile function is used !)
+#' @return
+#' @export
+fdc_values = function (Q, n=1000, sort=FALSE, na.rm=TRUE) {
+    if (na.rm) {
+        Q = Q[!is.na(Q)]
+    }
+    if (sort) {
+        m = length(Q)
+        pfdc = 1-1:m/m
+        Qfdc = sort(Q, na.last=ifelse(na.rm, NA, FALSE))
+    } else {
+        if (n > length(Q)) {
+            warning("'n' is larger than the number of values in 'Q'!")
+        }
+        pfdc = seq(0, 1, length.out=n)
+        Qfdc = compute_Qp(Q, p=pfdc)
+    }
+    return(dplyr::tibble(p=pfdc, Q=Qfdc))
+}
+
+
 ## 1. HYDROGRAPH _____________________________________________________
 # Computes the hydrograph of a station
 #' @title Hydrograph
