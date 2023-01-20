@@ -97,6 +97,8 @@ get_hydrograph = function (data, period=NULL, df_meta=NULL) {
         # Extracts only the data of this period
         subdata = data[data$Date >= as.Date(period[1])
                           & data$Date <= as.Date(period[2]),]
+    } else {
+        subdata = data
     }
     
     # If there is the metadata

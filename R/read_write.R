@@ -26,22 +26,35 @@ write_tibble = function (tbl, filedir, filename='data.txt') {
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
     }
-    
+
+    name = gsub("[.].*$", "", filename)
     format = gsub("^.*[.]", "", filename)
     filepath = file.path(filedir, filename)
     
-    if (format == "fst") {
-        fst::write_fst(tbl, filepath, compress=0)
+    if (any(class(tbl) == "list")) {
+        N = length(tbl)
+        for (i in 1:N) {
+            write_tibble(tbl[[i]],
+                         filedir=file.path(filedir, name) ,
+                         filename=paste0(names(tbl)[i],
+                                         ".",
+                                         format))
+        }
 
-    } else if (format == "Rdata") {
-        save(tbl, file=filepath)
-        
-    } else if (format == "txt") {
-        write.table(tbl,
-                file=filepath,
-                sep=";",
-                quote=FALSE,
-                row.names=FALSE)
+    } else {
+        if (format == "fst") {
+            fst::write_fst(tbl, filepath, compress=0)
+
+        } else if (format == "Rdata") {
+            save(tbl, file=filepath)
+            
+        } else if (format == "txt") {
+            write.table(tbl,
+                        file=filepath,
+                        sep=";",
+                        quote=FALSE,
+                        row.names=FALSE)
+        }
     }
 }
 
@@ -149,36 +162,50 @@ read_tibble = function (filepath=NULL, filedir=NULL, filename=NULL) {
     } else if (is.null(filepath) & is.null(filedir) & is.null(filename)) {
         stop ("Neither a filepath nor a filename and a filedir are given")
     }
-    
-    format = gsub("^.*[.]", "", filepath)
-    
-    if (format == "fst") {
-        tbl = dplyr::tibble(fst::read_fst(filepath))
 
-    } else if (format == "Rdata") {
-        tmp = load(filepath)
-        tbl = get(tmp)
-        tbl = as_tibble(tbl)
-        rm (tmp)
+    if (dir.exists(filepath)) {
+        Filepath = list.files(filepath,
+                              full.names=TRUE)
+        Tbl = list()
+        for (f in Filepath) {
+            tbl = read_tibble(filepath=f)
+            Tbl = append(Tbl, list(tbl))
+            names(Tbl)[length(Tbl)] = gsub("[.].*$", "",
+                                           basename(f))
+        }
+        return (Tbl)
         
-    } else if (format == "txt") {
-        tbl = dplyr::as_tibble(read.table(file=filepath,
-                                          header=TRUE,
-                                          sep=";",
-                                          quote='"'))
-        for (j in 1:ncol(tbl)) {
-            if (is.factor(tbl[[j]])) {
-                d = try(as.Date(tbl[[1, j]], format="%Y-%m-%d"))
-                test = nchar(as.character(tbl[[1, j]])) > 10
-                if("try-error" %in% class(d) || is.na(d) | test) {
-                    tbl[j] = as.character(tbl[[j]])
-                } else {
-                    tbl[j] = as.Date(tbl[[j]])
+    } else {
+        format = gsub("^.*[.]", "", basename(filepath))
+        
+        if (format == "fst") {
+            tbl = dplyr::tibble(fst::read_fst(filepath))
+
+        } else if (format == "Rdata") {
+            tmp = load(filepath)
+            tbl = get(tmp)
+            tbl = as_tibble(tbl)
+            rm (tmp)
+            
+        } else if (format == "txt") {
+            tbl = dplyr::as_tibble(read.table(file=filepath,
+                                              header=TRUE,
+                                              sep=";",
+                                              quote='"'))
+            for (j in 1:ncol(tbl)) {
+                if (is.factor(tbl[[j]])) {
+                    d = try(as.Date(tbl[[1, j]], format="%Y-%m-%d"))
+                    test = nchar(as.character(tbl[[1, j]])) > 10
+                    if("try-error" %in% class(d) || is.na(d) | test) {
+                        tbl[j] = as.character(tbl[[j]])
+                    } else {
+                        tbl[j] = as.Date(tbl[[j]])
+                    }
                 }
             }
         }
+        return (tbl)
     }
-    return (tbl)
 }
 
 
