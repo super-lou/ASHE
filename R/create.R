@@ -477,7 +477,6 @@ extract_meta = function (computer_data_path, filedir, filename,
         # Extract all the header
         metatxt = c(readLines(file_path, n=41, encoding="UTF-8"))
 
-
         # print(metatxt[11])
         # print(metatxt[12])
         # print(metatxt[13])
@@ -551,7 +550,7 @@ extract_meta = function (computer_data_path, filedir, filename,
         return (df_meta)
 
     } else {
-        print(paste('filename', file_path, 'do not exist'))
+        print(paste('filepath', file_path, 'do not exist'))
         return (NULL)
     }
 }
@@ -576,6 +575,7 @@ extract_meta = function (computer_data_path, filedir, filename,
 #' @return A tibble containing data about selected stations.
 #' @export
 extract_data = function (computer_data_path, filedir, filename,
+                         val2keep=NULL,
                          verbose=TRUE) {
     
     # Convert the filename in vector
@@ -619,10 +619,11 @@ extract_data = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             data = rbind(data,
-                            extract_data(computer_data_path, 
-                                           filedir, 
-                                         f,
-                                         verbose=FALSE))
+                         extract_data(computer_data_path=computer_data_path, 
+                                      filedir=filedir, 
+                                      filename=f,
+                                      val2keep=val2keep,
+                                      verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
         rownames(data) = NULL
@@ -656,24 +657,42 @@ extract_data = function (computer_data_path, filedir, filename,
         code = df_meta$Code
         # Create a tibble with the date as Date class and the code
         # of the station
-        
-        # colClasses = c("integer", "integer", "double",
-                       # "integer", "integer", "integer")
         data = tibble(data)
         for (j in 1:ncol(data)) {
             if (is.factor(data[[j]])) {
                 data[j] = as.numeric(as.character(data[[j]]))
             }
         }
+
+        if (!is.null(val2keep)) {
+            data = dplyr::mutate(data,
+                                 Date=as.Date(as.character(data$Date),
+                                              format="%Y%m%d"),
+                                 Q=data$Qls*1E-3,
+                                 Code=code,
+                                 !!rlang::data_sym(names(val2keep)),
+                                 .keep="used")
+
+            isNA = data[[names(val2keep)]] != val2keep
+            isNArle = rle(isNA)
+            isNArle = isNArle$lengths*isNArle$values
+            N = nrow(data)
+            data = data[(isNArle[1]+1):(N-isNArle[length(isNArle)]),]
+            data$Q[data[[names(val2keep)]] != val2keep] = NA
+            data = dplyr::select(data, -names(val2keep))
+        } else {
+            data = dplyr::mutate(data,
+                                 Date=as.Date(as.character(data$Date),
+                                              format="%Y%m%d"),
+                                 Q=data$Qls*1E-3,
+                                 Code=code,
+                                 .keep="used")
+        }
         
-        data = tibble(Date=as.Date(as.character(data$Date),
-                                   format="%Y%m%d"),
-                      Q=data$Qls * 1E-3,
-                      Code=code)
         return (data)
 
     } else {
-        print(paste('filename', file_path, 'do not exist'))
+        print(paste('filepath', file_path, 'do not exist'))
         return (NULL)
     }
 }

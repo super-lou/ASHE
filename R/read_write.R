@@ -21,7 +21,7 @@
 
 
 ## 1. WRITING ________________________________________________________
-write_tibble = function (tbl, filedir, filename='data.txt') {
+write_tibble = function (tbl, filedir="./", filename='data.txt') {
 
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
@@ -35,7 +35,7 @@ write_tibble = function (tbl, filedir, filename='data.txt') {
         N = length(tbl)
         for (i in 1:N) {
             write_tibble(tbl[[i]],
-                         filedir=file.path(filedir, name) ,
+                         filedir=file.path(filedir, name, format) ,
                          filename=paste0(names(tbl)[i],
                                          ".",
                                          format))
@@ -155,7 +155,8 @@ write_dataFST = function (data, resdir, filedir='fst',
 
 
 ## 2. READING ________________________________________________________
-read_tibble = function (filepath=NULL, filedir=NULL, filename=NULL) {
+read_tibble = function (filepath=NULL,
+                        filedir="./", filename="data.txt") {
     
     if (is.null(filepath) & !is.null(filedir) & !is.null(filename)) {
         filepath = file.path(filedir, filename)
@@ -163,8 +164,14 @@ read_tibble = function (filepath=NULL, filedir=NULL, filename=NULL) {
         stop ("Neither a filepath nor a filename and a filedir are given")
     }
 
-    if (dir.exists(filepath)) {
-        Filepath = list.files(filepath,
+    filepath_name = gsub("[.].*$", "", basename(filepath))
+    filepath_format = gsub("^.*[.]", "", basename(filepath))
+    filepath_dir = file.path(dirname(filepath),
+                             filepath_name,
+                             filepath_format)
+
+    if (dir.exists(filepath_dir)) {
+        Filepath = list.files(filepath_dir,
                               full.names=TRUE)
         Tbl = list()
         for (f in Filepath) {
