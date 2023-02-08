@@ -485,7 +485,7 @@ extract_meta = function (computer_data_path, filedir, filename,
         # Create a tibble with all the metadata needed
         # (IN for INRAE data and BH for BH data)
         df_meta =
-            tibble(
+            dplyr::tibble(
                 # Station code
                 Code=trimws(substr(metatxt[11], 38,
                                    nchar(metatxt[11]))),
@@ -657,7 +657,7 @@ extract_data = function (computer_data_path, filedir, filename,
         code = df_meta$Code
         # Create a tibble with the date as Date class and the code
         # of the station
-        data = tibble(data)
+        data = dplyr::tibble(data)
         for (j in 1:ncol(data)) {
             if (is.factor(data[[j]])) {
                 data[j] = as.numeric(as.character(data[[j]]))
@@ -673,7 +673,7 @@ extract_data = function (computer_data_path, filedir, filename,
                                  !!rlang::data_sym(names(val2keep)),
                                  .keep="used")
 
-            isNA = data[[names(val2keep)]] != val2keep
+            isNA = data[[names(val2keep)]] != val2keep | is.na(data$Q)
             isNArle = rle(isNA)
             isNArle = isNArle$lengths*isNArle$values
             N = nrow(data)
@@ -688,7 +688,6 @@ extract_data = function (computer_data_path, filedir, filename,
                                  Code=code,
                                  .keep="used")
         }
-        
         return (data)
 
     } else {
