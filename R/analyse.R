@@ -60,7 +60,7 @@ fdc_values = function (Q, n=1000, sort=FALSE, na.rm=TRUE) {
 # Computes the hydrograph of a station
 #' @title Hydrograph
 #' @export
-get_hydrograph = function (data, period=NULL, df_meta=NULL) {
+get_hydrograph = function (data, meta=NULL, period=NULL) {
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -102,15 +102,15 @@ get_hydrograph = function (data, period=NULL, df_meta=NULL) {
     }
     
     # If there is the metadata
-    if (!is.null(df_meta)) {
+    if (!is.null(meta)) {
         # New column in metadata for hydrological regime
-        df_meta$regime_hydro = NA
+        meta$regime_hydro = NA
         # New column in metadata for the start of the hydrological year
-        df_meta$maxQM = NA
-        df_meta$minQM = NA
+        meta$maxQM = NA
+        meta$minQM = NA
         
         # Get all different stations code
-        Code = rle(subdata$Code)$value
+        Code = levels(factor(subdata$Code))
         # Number of stations
         nCode = length(Code)
         
@@ -121,20 +121,21 @@ get_hydrograph = function (data, period=NULL, df_meta=NULL) {
     }
 
     # Blank tibble to store data
-    df_QM = tibble()
+    QM = tibble()
     # For all accessible code
     for (k in 1:nCode) {
         # If there is the metadata
-        if (!is.null(df_meta)) {
+        if (!is.null(meta)) {
             # Gets the code
             code = Code[k]
             # Get the associated data
             subdata_code = subdata[subdata$Code == code,]
+            
         } else {
             # The data are the date for the current code
             subdata_code = subdata
         }
-        
+
         # Gets a list of the month of the data as numeric
         monthData = as.numeric(format(subdata_code$Date, "%m"))
         # Blank list to stock month mean
@@ -166,31 +167,31 @@ get_hydrograph = function (data, period=NULL, df_meta=NULL) {
         } 
         
         # If there is the metadata
-        if (!is.null(df_meta)) {
+        if (!is.null(meta)) {
             # Creates a temporary tibble to store hydrograph results
-            df_QMtmp = tibble(QM=QM_code, Code=code)
+            QMtmp = tibble(QM=QM_code, Code=code)
             # Stores it
-            df_QM = bind_rows(df_QM, df_QMtmp)
+            QM = bind_rows(QM, QMtmp)
             # Stores result of the hydrological regime
-            df_meta$regime_hydro[df_meta$Code == code] = classRegime
+            meta$regime_hydro[meta$Code == code] = classRegime
             
             # Computes the month of the max QM
             maxQM = which.max(QM_code)
             # Computes the month of the max QM
             minQM = which.min(QM_code)
             # Stores it as the start of the hydrological year
-            df_meta$maxQM[df_meta$Code == code] = maxQM
-            df_meta$minQM[df_meta$Code == code] = minQM
+            meta$maxQM[meta$Code == code] = maxQM
+            meta$minQM[meta$Code == code] = minQM
             
         # Otherwise
         } else {
             # No tibble needed
-            df_QM = QM_code
-            df_meta = classRegime
+            QM = QM_code
+            meta = classRegime
         }
     }
     # Returns the hydrograph and meta data
-    return (list(QM=df_QM, meta=df_meta))
+    return (list(QM=QM, meta=meta))
 }
 
 
@@ -198,7 +199,7 @@ get_hydrograph = function (data, period=NULL, df_meta=NULL) {
 # Compute the break date of the flow data by station 
 #' @title Break
 #' @export
-get_break = function (data, df_meta, level=0.1) {
+get_break = function (data, meta, level=0.1) {
     
     # Get all different stations code
     Code = rle(data$Code)$value
@@ -239,9 +240,9 @@ get_break = function (data, df_meta, level=0.1) {
         # step2 = mean(data_codeNoNA$Q[(ibreak+1):nbreak])
     }
     # Create a tibble with the break analysis results
-    df_break = tibble(Code=Code_break, Date=as.Date(Date_break),
+    break = tibble(Code=Code_break, Date=as.Date(Date_break),
                       significant=Signif_break)
-    return (df_break)
+    return (break)
 }
 
 
@@ -249,7 +250,7 @@ get_break = function (data, df_meta, level=0.1) {
 # Compute the time gap by station
 #' @title Time gap
 #' @export
-get_lacune = function (data, df_meta) {
+get_lacune = function (data, meta) {
     
     # Get all different stations code
     Code = rle(data$Code)$value
@@ -295,8 +296,8 @@ get_lacune = function (data, df_meta) {
     # Compute the cumulative gap rate in pourcent
     tLac100 = tLac * 100
     # Create tibble for lacune
-    df_lac = tibble(Code=Code, tLac100=tLac100, meanLac=meanLac)
+    lac = tibble(Code=Code, tLac100=tLac100, meanLac=meanLac)
     # Join a tibble
-    df_meta = full_join(df_meta, df_lac, by="Code")
-    return (df_meta)
+    meta = full_join(meta, lac, by="Code")
+    return (meta)
 }
