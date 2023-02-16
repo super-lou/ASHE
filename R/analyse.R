@@ -104,7 +104,8 @@ get_hydrograph = function (data, meta=NULL, period=NULL) {
     # If there is the metadata
     if (!is.null(meta)) {
         # New column in metadata for hydrological regime
-        meta$regime_hydro = NA
+        meta$regimeHydro = NA
+        meta$typologie_regimeHydro = NA
         # New column in metadata for the start of the hydrological year
         meta$maxQM = NA
         meta$minQM = NA
@@ -160,8 +161,10 @@ get_hydrograph = function (data, meta=NULL, period=NULL) {
         
         if (regime < 7) {
             classRegime = "Pluvial"
+
         } else if (regime >= 7 & regime < 10) {
             classRegime = "Transition"
+            
         } else if (regime >= 10) {
             classRegime = "Nival Glaciaire"
         } 
@@ -173,7 +176,8 @@ get_hydrograph = function (data, meta=NULL, period=NULL) {
             # Stores it
             QM = bind_rows(QM, QMtmp)
             # Stores result of the hydrological regime
-            meta$regime_hydro[meta$Code == code] = classRegime
+            meta$regimeHydro[meta$Code == code] = classRegime
+            meta$typologie_regimeHydro[meta$Code == code] = regime
             
             # Computes the month of the max QM
             maxQM = which.max(QM_code)
