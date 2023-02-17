@@ -21,41 +21,6 @@
 
 
 
-### 2.3. FDC _______________________________________________________
-#' @title fdc_values
-#' @description Given a vector of streamflow values, computes a
-#' data.frame with two columns : a 'p' column containing the
-#' probability of exceedance and a 'Q' column containing the
-#' corresponding streamflow values. Two methods can be used : simply
-#' sorting the data (not recommended) or using the quantile function.
-#' @param Q Streamflow vector
-#' @param n number of rows in the resulting data.frame (should be
-#' smaller than the length of 'Q'.
-#' @param sort logical. Should the sort function be used instead
-#' of the quantile function ?
-#' @param na.rm logical. Should the missing values be ignored ? (must
-#' be TRUE if the quantile function is used !)
-#' @return
-#' @export
-fdc_values = function (Q, n=1000, sort=FALSE, na.rm=TRUE) {
-    if (na.rm) {
-        Q = Q[!is.na(Q)]
-    }
-    if (sort) {
-        m = length(Q)
-        pfdc = 1-1:m/m
-        Qfdc = sort(Q, na.last=ifelse(na.rm, NA, FALSE))
-    } else {
-        if (n > length(Q)) {
-            warning("'n' is larger than the number of values in 'Q'!")
-        }
-        pfdc = seq(0, 1, length.out=n)
-        Qfdc = compute_Qp(Q, p=pfdc)
-    }
-    return(dplyr::tibble(p=pfdc, Q=Qfdc))
-}
-
-
 ## 1. HYDROGRAPH _____________________________________________________
 # Computes the hydrograph of a station
 #' @title Hydrograph
@@ -200,8 +165,7 @@ get_hydrograph = function (data, meta=NULL, period=NULL) {
 
 
 
-
-find_regime = function (QM) {
+find_regimeHydro = function (QM_code, returnStr=FALSE) {
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -233,31 +197,34 @@ find_regime = function (QM) {
                         'GROUP5', 'GROUP6', 'GROUP7', 'GROUP8',
                         'GROUP9', 'GROUP10', 'GROUP11', 'GROUP12')
 
-    regimeHydro = 0
-    typology_regimeHydro = ""
+    id = 0
+    typology = ""
     distance = rep(0, length(xref[,1]))
     distancemin = 0
     for (j in 1:length(xref[,1])) {
-        distance[j] = sum((QM / mean(QM, na.rm=TRUE) - xref[j, ])^2)
+        distance[j] = sum((QM_code / mean(QM_code, na.rm=TRUE) - xref[j, ])^2)
     }
-    regimeHydro = which.min(distance)
+    id = which.min(distance)
     distancemin = distance[which.min(distance)]
     
-    if (regimeHydro < 7) {
-        typology_regimeHydro = "Pluvial"
+    if (id < 7) {
+        typology = "Pluvial"
 
-    } else if (regimeHydro >= 7 & regimeHydro < 10) {
-        typology_regimeHydro = "Transition"
+    } else if (id >= 7 & id < 10) {
+        typology = "Transition"
         
-    } else if (regimeHydro >= 10) {
-        typology_regimeHydro = "Nival Glaciaire"
+    } else if (id >= 10) {
+        typology = "Nival Glaciaire"
     } 
 
-    res = list(regimeHydro=regimeHydro,
-               typology_regimeHydro=typology_regimeHydro)
-    return (res)
+    if (returnStr) {
+        regimeHydro = paste0(typology,"_",id)
+    } else {
+        regimeHydro = list(id=id,
+                           typology=typology)
+    }
+    return (regimeHydro)
 }
-
 
 
 
