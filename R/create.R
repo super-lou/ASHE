@@ -529,6 +529,11 @@ extract_meta = function (computer_data_path, filedir, filename,
 
                 # The path to the data file of BH
                 file_path=file_path)
+        
+        meta$surface_km2_BH[(meta$surface_km2_BH) <= 0] = NA
+        meta$surface_km2_IN[(meta$surface_km2_BH) <= 0] = NA
+        meta$altitude_m_BH[(meta$altitude_m_BH) < 0] = NA
+        meta$altitude_m_IN[(meta$altitude_m_BH) < 0] = NA
 
         Ltmp = names(iRegHydro())[nchar(names(iRegHydro())) == 2]
         Ltmp = substr(Ltmp, 1, 1)

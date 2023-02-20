@@ -22,10 +22,8 @@
 
 
 ## 1. HYDROGRAPH _____________________________________________________
-# Computes the hydrograph of a station
-#' @title Hydrograph
-#' @export
-get_hydrograph = function (data, meta=NULL, period=NULL) {
+
+hide_find_regimeHydro = function (QM_code, forceId=NA) {
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -53,150 +51,10 @@ get_hydrograph = function (data, meta=NULL, period=NULL) {
           0.175, 0.117, 0.067, 0.042, 0.025),
         ncol=12, byrow=TRUE)
     colnames(xref) = seq(1, 12, 1)
-    row.names(xref) = c('GROUP1', 'GROUP2', 'GROUP3', 'GROUP4',
-                        'GROUP5', 'GROUP6', 'GROUP7', 'GROUP8',
-                        'GROUP9', 'GROUP10', 'GROUP11', 'GROUP12')  
-    
-    # If there is a specified period
-    if (!is.null(period)) {
-        # Extracts only the data of this period
-        subdata = data[data$Date >= as.Date(period[1])
-                          & data$Date <= as.Date(period[2]),]
-    } else {
-        subdata = data
-    }
-    
-    # If there is the metadata
-    if (!is.null(meta)) {
-        # New column in metadata for hydrological regime
-        meta$regimeHydro = NA
-        meta$typologie_regimeHydro = NA
-        # New column in metadata for the start of the hydrological year
-        meta$maxQM = NA
-        meta$minQM = NA
-        
-        # Get all different stations code
-        Code = levels(factor(subdata$Code))
-        # Number of stations
-        nCode = length(Code)
-        
-    # Otherwise it is just a list of flow from one station
-    } else {
-        # Only one code is present
-        nCode = 1
-    }
-
-    # Blank tibble to store data
-    QM = tibble()
-    # For all accessible code
-    for (k in 1:nCode) {
-        # If there is the metadata
-        if (!is.null(meta)) {
-            # Gets the code
-            code = Code[k]
-            # Get the associated data
-            subdata_code = subdata[subdata$Code == code,]
-            
-        } else {
-            # The data are the date for the current code
-            subdata_code = subdata
-        }
-
-        # Gets a list of the month of the data as numeric
-        monthData = as.numeric(format(subdata_code$Date, "%m"))
-        # Blank list to stock month mean
-        QM_code = c()
-        # For all months
-        for (i in 1:12) {
-            # Gets all the flow data associated to the current month
-            Q = subdata_code$Q[monthData == i]
-            # Averages the data
-            QM_code[i] = mean(Q, na.rm=TRUE)
-        }
-
-        regime = 0
-        classRegime = ""
-        distance = rep(0, length(xref[,1]))
-        distancemin = 0
-        for (j in 1:length(xref[,1])) {
-            distance[j] = sum((QM_code / mean(QM_code) - xref[j,])^2)
-        }
-        regime = which.min(distance)
-        distancemin = distance[which.min(distance)]
-        
-        if (regime < 7) {
-            classRegime = "Pluvial"
-
-        } else if (regime >= 7 & regime < 10) {
-            classRegime = "Transition"
-            
-        } else if (regime >= 10) {
-            classRegime = "Nival Glaciaire"
-        } 
-        
-        # If there is the metadata
-        if (!is.null(meta)) {
-            # Creates a temporary tibble to store hydrograph results
-            QMtmp = tibble(QM=QM_code, Code=code)
-            # Stores it
-            QM = bind_rows(QM, QMtmp)
-            # Stores result of the hydrological regime
-            meta$regimeHydro[meta$Code == code] = classRegime
-            meta$typologie_regimeHydro[meta$Code == code] = regime
-            
-            # Computes the month of the max QM
-            maxQM = which.max(QM_code)
-            # Computes the month of the max QM
-            minQM = which.min(QM_code)
-            # Stores it as the start of the hydrological year
-            meta$maxQM[meta$Code == code] = maxQM
-            meta$minQM[meta$Code == code] = minQM
-            
-        # Otherwise
-        } else {
-            # No tibble needed
-            QM = QM_code
-            meta = classRegime
-        }
-    }
-    # Returns the hydrograph and meta data
-    return (list(QM=QM, meta=meta))
-}
-
-
-
-find_regimeHydro = function (QM_code, returnStr=FALSE) {
-    xref = matrix(
-        c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
-          0.064, 0.064, 0.069, 0.076, 0.089,
-          0.133, 0.126, 0.111, 0.110, 0.081, 0.056, 0.038,
-          0.027, 0.042, 0.063, 0.098, 0.117,
-          0.128, 0.142, 0.122, 0.128, 0.105, 0.065, 0.035,
-          0.024, 0.031, 0.044, 0.074, 0.101,
-          0.157, 0.130, 0.119, 0.094, 0.062, 0.042, 0.028,
-          0.021, 0.035, 0.062, 0.099, 0.150,
-          0.204, 0.163, 0.118, 0.102, 0.060, 0.030, 0.018,
-          0.012, 0.023, 0.041, 0.087, 0.143,
-          0.156, 0.154, 0.117, 0.119, 0.086, 0.044, 0.025,
-          0.015, 0.025, 0.044, 0.089, 0.127,
-          0.139, 0.092, 0.082, 0.099, 0.087, 0.039, 0.015,
-          0.012, 0.036, 0.108, 0.159, 0.131,
-          0.112, 0.098, 0.101, 0.125, 0.122, 0.072, 0.036,
-          0.024, 0.039, 0.067, 0.102, 0.102,
-          0.058, 0.050, 0.100, 0.142, 0.158, 0.092, 0.067,
-          0.050, 0.042, 0.058, 0.083, 0.100,
-          0.050, 0.050, 0.058, 0.083, 0.150, 0.167, 0.117,
-          0.083, 0.058, 0.058, 0.067, 0.058,
-          0.033, 0.025, 0.033, 0.075, 0.167, 0.217, 0.142,
-          0.092, 0.067, 0.058, 0.050, 0.042,
-          0.017, 0.008, 0.017, 0.042, 0.108, 0.183, 0.200,
-          0.175, 0.117, 0.067, 0.042, 0.025),
-        ncol=12, byrow=TRUE)
-    colnames(xref) = seq(1, 12, 1)
-    row.names(xref) = c('GROUP1', 'GROUP2', 'GROUP3', 'GROUP4',
-                        'GROUP5', 'GROUP6', 'GROUP7', 'GROUP8',
-                        'GROUP9', 'GROUP10', 'GROUP11', 'GROUP12')
-
+    groupname = c('GROUP1', 'GROUP2', 'GROUP3', 'GROUP4',
+                  'GROUP5', 'GROUP6', 'GROUP7', 'GROUP8',
+                  'GROUP9', 'GROUP10', 'GROUP11', 'GROUP12')
+    row.names(xref) = groupname
     id = 0
     typology = ""
     distance = rep(0, length(xref[,1]))
@@ -204,8 +62,19 @@ find_regimeHydro = function (QM_code, returnStr=FALSE) {
     for (j in 1:length(xref[,1])) {
         distance[j] = sum((QM_code / mean(QM_code, na.rm=TRUE) - xref[j, ])^2)
     }
-    id = which.min(distance)
-    distancemin = distance[which.min(distance)]
+    
+    if (all(!is.na(forceId))) {
+        id = which.min(distance[forceId]) + min(forceId) - 1
+    } else {
+        id = which.min(distance)
+    }
+    id = as.numeric(id)
+    # distancemin = distance[which.min(distance)]
+
+    # names(distance) = groupname
+    # distance = sort(distance)
+    # print(distance)
+    # print("")
     
     if (id < 7) {
         typology = "Pluvial"
@@ -215,17 +84,70 @@ find_regimeHydro = function (QM_code, returnStr=FALSE) {
         
     } else if (id >= 10) {
         typology = "Nival Glaciaire"
-    } 
-
-    if (returnStr) {
-        regimeHydro = paste0(typology,"_",id)
-    } else {
-        regimeHydro = list(id=id,
-                           typology=typology)
     }
+    
+    regimeHydro = list(id=id,
+                       typology=typology)
     return (regimeHydro)
 }
 
+
+# Computes the hydrograph of a station
+#' @title Hydrograph
+#' @export
+find_regimeHydro = function (dataEXserieQM,
+                             lim_number=NULL,
+                             dataEXseriePA=NULL) {
+
+    if (!is.null(dataEXseriePA)) {
+        isPluvial =
+            dplyr::summarise(dplyr::group_by(dataEXseriePA,
+                                             Code),
+                             bool=mean(PAs, na.rm=TRUE) <
+                                 0.05*mean(PA, na.rm=TRUE),
+                             .groups="drop")
+        isPluvial$forceId = NA
+        isPluvial$forceId[isPluvial$bool] = list(1:7)
+        dataEXserieQM = dplyr::full_join(dataEXserieQM,
+                                         dplyr::select(isPluvial,
+                                                       c("Code",
+                                                         "forceId")),
+                                         by="Code")
+    } else {
+        dataEXserieQM$forceId = NA
+    }
+    
+    regimeHydro =
+        dplyr::summarise(dplyr::group_by(dataEXserieQM,
+                                         Code),
+                         as_tibble(
+                             hide_find_regimeHydro(QM,
+                                                   forceId[[1]])),
+                         .groups="drop")
+
+    if (!is.null(lim_number)) {
+        find_nearest = function (id, Id, lim_number) {
+            nId = table(Id)
+            nId = nId[nId >= lim_number]
+            nId_value = as.numeric(names(nId))
+            disp = abs(nId_value - id)
+            id = max(nId_value[disp == min(disp)])
+            return (id)
+        }        
+        regimeHydro =
+            dplyr::mutate(dplyr::group_by(regimeHydro, id),
+                          id=dplyr::if_else(dplyr::n() < lim_number,
+                                            find_nearest(id[1],
+                                                         regimeHydro$id,
+                                                         lim_number),
+                                            id[1]),
+                          .keep="all")
+    }
+    
+    regimeHydro$str = paste0(regimeHydro$typology,
+                             " - ", regimeHydro$id) 
+    return (regimeHydro)
+}
 
 
 ## 2. BREAK DATE _____________________________________________________
@@ -274,7 +196,7 @@ get_break = function (data, meta, level=0.1) {
     }
     # Create a tibble with the break analysis results
     break = tibble(Code=Code_break, Date=as.Date(Date_break),
-                      significant=Signif_break)
+                   significant=Signif_break)
     return (break)
 }
 
