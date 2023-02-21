@@ -23,7 +23,7 @@
 
 ## 1. HYDROGRAPH _____________________________________________________
 
-hide_find_regimeHydro = function (QM_code, forceId=NA) {
+hide_find_regimeHydro = function (QM_code, forceId=NA, check=FALSE) {
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -55,6 +55,37 @@ hide_find_regimeHydro = function (QM_code, forceId=NA) {
                   'GROUP5', 'GROUP6', 'GROUP7', 'GROUP8',
                   'GROUP9', 'GROUP10', 'GROUP11', 'GROUP12')
     row.names(xref) = groupname
+
+    if (check) {
+        dev_path = file.path(dirname(dirname(dirname(getwd()))),
+                             'dataSHEEP_project', 'dataSHEEP',
+                             "__SHEEP__")
+        if (file.exists(dev_path)) {
+            list_path = list.files(dev_path,
+                                   pattern='*.R$',
+                                   full.names=TRUE,
+                                   recursive=TRUE)
+            for (path in list_path) {
+                source(path, encoding='UTF-8')    
+            }
+        }
+        library(ggplot2)
+        outdir = "regimeHydro_check"
+        if (!(file.exists(outdir))) {
+            dir.create(outdir, recursive=TRUE)
+        }
+        for (i in 1:length(groupname)) {
+            plot = panel_hydrograph(xref[i,], groupname[i])
+            ggplot2::ggsave(plot=plot,
+                            filename=paste0(groupname[i], ".pdf"),
+                            path=outdir,
+                            width=5, height=3,
+                            units="cm",
+                            dpi=100)
+        }
+        return ()
+    }
+    
     id = 0
     typology = ""
     distance = rep(0, length(xref[,1]))
