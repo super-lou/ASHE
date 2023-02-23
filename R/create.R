@@ -450,21 +450,21 @@ extract_meta = function (computer_data_path, filedir, filename,
         }
         
         # Create a blank data frame
-        df_meta = data.frame()
+        meta = data.frame()
         
         # For all the file in the filelist
         for (f in filelist) {
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
-            df_meta = rbind(df_meta,
+            meta = rbind(meta,
                             extract_meta(computer_data_path, 
                                          filedir, 
                                          f,
                                          verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
-        rownames(df_meta) = NULL
-        return (df_meta)
+        rownames(meta) = NULL
+        return (meta)
     }
 
     # Get the filename from the vector
@@ -485,7 +485,7 @@ extract_meta = function (computer_data_path, filedir, filename,
         
         # Create a tibble with all the metadata needed
         # (IN for INRAE data and BH for BH data)
-        df_meta =
+        meta =
             dplyr::tibble(
                 # Station code
                 Code=trimws(substr(metatxt[11], 38,
@@ -539,8 +539,8 @@ extract_meta = function (computer_data_path, filedir, filename,
         Ltmp = substr(Ltmp, 1, 1)
         infoSecteur = rle(sort(Ltmp))$values
         
-        oneL = substr(df_meta$Code, 1, 1)
-        twoL = substr(df_meta$Code, 1, 2)
+        oneL = substr(meta$Code, 1, 1)
+        twoL = substr(meta$Code, 1, 2)
         RH = c()
         for (i in 1:length(oneL)) {
             if (oneL[i] %in% infoSecteur) {
@@ -552,8 +552,8 @@ extract_meta = function (computer_data_path, filedir, filename,
         }
         
         # Adding of the hydrological region
-        df_meta$region_hydro = RH
-        return (df_meta)
+        meta$region_hydro = RH
+        return (meta)
 
     } else {
         print(paste('filepath', file_path, 'do not exist'))
@@ -561,7 +561,7 @@ extract_meta = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# df_meta = extract_meta(
+# meta = extract_meta(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     "BanqueHydro_Export2021",
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
@@ -657,10 +657,10 @@ extract_data = function (computer_data_path, filedir, filename,
                           skip=41)
 
         # Extract all the metadata for the station
-        df_meta = extract_meta(computer_data_path, filedir, filename,
+        meta = extract_meta(computer_data_path, filedir, filename,
                                verbose=FALSE)
         # Get the code of the station
-        code = df_meta$Code
+        code = meta$Code
         # Create a tibble with the date as Date class and the code
         # of the station
         data = dplyr::tibble(data)
@@ -730,7 +730,7 @@ extract_climate_data = function (computer_data_path, filedir,
     
     basin = gsub("[^[:alnum:] ].*$", '', filelist)
     
-    df_meta = tibble(Code=basin)
+    meta = tibble(Code=basin)
     data = tibble()
     nfile = length(filelist)
     
@@ -748,7 +748,7 @@ extract_climate_data = function (computer_data_path, filedir,
     }
     colnames(data) = c(colNames, 'Code')
     data$Date = as.Date(data$Date) 
-    res = list(data=data, meta=df_meta)
+    res = list(data=data, meta=meta)
     return (res)
 }
 # Example

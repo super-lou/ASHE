@@ -22,8 +22,8 @@
 
 
 ## 1. HYDROGRAPH _____________________________________________________
-
-hide_find_regimeHydro = function (QM_code, forceId=NA, check=FALSE) {
+hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
+                                  check=FALSE) {
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072,
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -89,24 +89,29 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, check=FALSE) {
     id = 0
     typology = ""
     distance = rep(0, length(xref[,1]))
-    distancemin = 0
+    # distancemin = 0
     for (j in 1:length(xref[,1])) {
         distance[j] = sum((QM_code / mean(QM_code, na.rm=TRUE) - xref[j, ])^2)
     }
-    
+
+    id_tmp = which.min(distance)
     if (all(!is.na(forceId))) {
-        id = which.min(distance[forceId]) + min(forceId) - 1
+        if (all(!is.na(forceIdIf))) {
+            if (id_tmp %in% forceIdIf) {
+                id = which.min(distance[forceId]) + min(forceId) - 1
+            } else {
+                id = id_tmp
+            }
+        } else {
+            id = which.min(distance[forceId]) + min(forceId) - 1
+        }
     } else {
-        id = which.min(distance)
+        id = id_tmp
     }
+
     id = as.numeric(id)
     # distancemin = distance[which.min(distance)]
 
-    # names(distance) = groupname
-    # distance = sort(distance)
-    # print(distance)
-    # print("")
-    
     if (id < 7) {
         typology = "Pluvial"
 
@@ -117,8 +122,31 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, check=FALSE) {
         typology = "Nival Glaciaire"
     }
     
+    if (id == 1) {
+        detail = "Pluvial faiblement contrasté"
+
+    } else if (id %in% 2:3) {
+        detail = "Pluvial modérément contrasté"
+        
+    } else if (id %in% 5:6) {
+        detail = "Pluvial fortement contrasté"
+
+    } else if (id == 7) { 
+        detail = "Pluvio-nival"
+
+    } else if (id %in% 8:9) {
+        detail = "Nivo-pluvial"
+
+    } else if (id == 10) {
+        detail = "Nival"
+        
+    } else if (id %in% 11:12) {
+        detail = "Nivo-glaciaire"
+    }
+
     regimeHydro = list(id=id,
-                       typology=typology)
+                       typology=typology,
+                       detail=detail)
     return (regimeHydro)
 }
 
@@ -128,32 +156,41 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, check=FALSE) {
 #' @export
 find_regimeHydro = function (dataEXserieQM,
                              lim_number=NULL,
-                             dataEXseriePA=NULL) {
-
+                             dataEXseriePA=NULL
+                             ) {
+    
     if (!is.null(dataEXseriePA)) {
-        isPluvial =
+        isMOD =
             dplyr::summarise(dplyr::group_by(dataEXseriePA,
                                              Code),
-                             bool=mean(PAs, na.rm=TRUE) <
+                             isPluvial=mean(PAs, na.rm=TRUE) <
+                                 0.05*mean(PA, na.rm=TRUE),
+                             isSnow=mean(PAs, na.rm=TRUE) >=
                                  0.05*mean(PA, na.rm=TRUE),
                              .groups="drop")
-        isPluvial$forceId = NA
-        isPluvial$forceId[isPluvial$bool] = list(1:7)
+        isMOD$forceId = NA
+        isMOD$forceIdIf = NA
+        isMOD$forceId[isMOD$isPluvial] = list(1:7)
+        isMOD$forceId[isMOD$isSnow] = list(7:9)
+        isMOD$forceIdIf[isMOD$isSnow] = list(1:3)
         dataEXserieQM = dplyr::full_join(dataEXserieQM,
-                                         dplyr::select(isPluvial,
+                                         dplyr::select(isMOD,
                                                        c("Code",
-                                                         "forceId")),
+                                                         "forceId",
+                                                         "forceIdIf")),
                                          by="Code")
     } else {
         dataEXserieQM$forceId = NA
+        dataEXserieQM$forceIdIf = NA
     }
-    
+
     regimeHydro =
         dplyr::summarise(dplyr::group_by(dataEXserieQM,
                                          Code),
                          as_tibble(
                              hide_find_regimeHydro(QM,
-                                                   forceId[[1]])),
+                                                   forceId[[1]],
+                                                   forceIdIf[[1]])),
                          .groups="drop")
 
     if (!is.null(lim_number)) {
@@ -174,9 +211,8 @@ find_regimeHydro = function (dataEXserieQM,
                                             id[1]),
                           .keep="all")
     }
-    
-    regimeHydro$str = paste0(regimeHydro$typology,
-                             " - ", regimeHydro$id) 
+
+    regimeHydro$id = formatC(regimeHydro$id, width=2, flag="0")
     return (regimeHydro)
 }
 
