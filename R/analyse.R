@@ -86,8 +86,6 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
         return ()
     }
     
-    id = 0
-    typology = ""
     distance = rep(0, length(xref[,1]))
     # distancemin = 0
     for (j in 1:length(xref[,1])) {
@@ -110,42 +108,75 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
     }
 
     id = as.numeric(id)
-    # distancemin = distance[which.min(distance)]
 
     if (id < 7) {
-        typology = "Pluvial"
+        typology_1 = "Pluvial"
 
     } else if (id >= 7 & id < 10) {
-        typology = "Transition"
+        typology_1 = "Transition"
         
     } else if (id >= 10) {
-        typology = "Nival Glaciaire"
+        typology_1 = "Nival Glaciaire"
     }
-    
-    if (id == 1) {
-        detail = "Pluvial faiblement contrasté"
 
-    } else if (id %in% 2:3) {
-        detail = "Pluvial modérément contrasté"
+    
+    if (id %in% 1:4) {
+        typology_2 = "Pluvial modérément contrasté"
         
     } else if (id %in% 5:6) {
-        detail = "Pluvial fortement contrasté"
+        typology_2 = "Pluvial contrasté"
 
     } else if (id == 7) { 
-        detail = "Pluvio-nival"
+        typology_2 = "Pluvio-nival"
 
     } else if (id %in% 8:9) {
-        detail = "Nivo-pluvial"
+        typology_2 = "Nivo-pluvial"
+
+    } else if (id %in% 10:12) {
+        typology_2 = "Nival & nivo-glaciaire"
+    }
+
+
+    if (id == 1) {
+        detail = "Pluvial faiblement contrasté 1"
+  
+    } else if (id == 2) {
+        detail = "Pluvial modérément contrasté 2"
+
+    } else if (id == 3) {
+        detail = "Pluvial modérément contrasté 3"
+
+    } else if (id == 4) {
+        detail = "Pluvial modérément contrasté 4"
+
+    } else if (id == 5) {
+        detail = "Pluvial contrasté 5"
+
+    } else if (id == 6) {
+        detail = "Pluvial fortement contrasté 6"
+
+    } else if (id == 7) { 
+        detail = "Pluvio-nival 7"
+
+    } else if (id == 8) {
+        detail = "Nivo-pluvial 8"
+
+    } else if (id == 9) {
+        detail = "Nivo-pluvial 9"
 
     } else if (id == 10) {
-        detail = "Nival"
+        detail = "Nival 10"
+
+    } else if (id == 11) {
+        detail = "Nival 11"
         
-    } else if (id %in% 11:12) {
-        detail = "Nivo-glaciaire"
+    } else if (id == 12) {
+        detail = "Nivo-glaciaire 12"
     }
 
     regimeHydro = list(id=id,
-                       typology=typology,
+                       typology_1=typology_1,
+                       typology_2=typology_2,
                        detail=detail)
     return (regimeHydro)
 }
@@ -196,7 +227,11 @@ find_regimeHydro = function (dataEXserieQM,
     if (!is.null(lim_number)) {
         find_nearest = function (id, Id, lim_number) {
             nId = table(Id)
-            nId = nId[nId >= lim_number]
+            ok = nId >= lim_number
+            nId = nId[ok]
+            if (all(!ok)) {
+                return (id)
+            }
             nId_value = as.numeric(names(nId))
             disp = abs(nId_value - id)
             id = max(nId_value[disp == min(disp)])
