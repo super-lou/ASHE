@@ -153,7 +153,7 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
         detail = "Pluvial contrasté 5"
 
     } else if (id == 6) {
-        detail = "Pluvial fortement contrasté 6"
+        detail = "Pluvial contrasté 6"
 
     } else if (id == 7) { 
         detail = "Pluvio-nival 7"
