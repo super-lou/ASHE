@@ -351,10 +351,10 @@ get_lacune = function (data, meta) {
     }
     
     # Compute the cumulative gap rate in pourcent
-    tLac100 = tLac * 100
+    tLac_pct = tLac * 100
     # Create tibble for lacune
-    lac = tibble(Code=Code, tLac100=tLac100, meanLac=meanLac)
+    lac = tibble(Code=Code, tLac_pct=tLac_pct, meanLac=meanLac)
     # Join a tibble
-    meta = full_join(meta, lac, by="Code")
+    meta = dplyr::full_join(meta, lac, by="Code")
     return (meta)
 }

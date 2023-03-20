@@ -395,7 +395,8 @@ convert_regexp = function (computer_data_path, filedir, filename) {
                          filelist_dir[grepl(f, filelist_dir)])
         }
     }
-    return (filelist)
+    Code = gsub("[_].*$", "", filelist)
+    return (Code)
 }
 
 ### 3.1. Extraction of metadata ______________________________________
@@ -491,27 +492,27 @@ extract_meta = function (computer_data_path, filedir, filename,
                 Code=trimws(substr(metatxt[11], 38,
                                    nchar(metatxt[11]))),
                 # Station name
-                nom=trimws(substr(metatxt[12], 39,
+                Nom=trimws(substr(metatxt[12], 39,
                                   nchar(metatxt[12]))),
                 # Territory
-                territoire=trimws(substr(metatxt[13], 39,
+                Territoire=trimws(substr(metatxt[13], 39,
                                          nchar(metatxt[13]))),
                 # Administrator
-                gestionnaire=trimws(substr(metatxt[7], 60,
+                Gestionnaire=trimws(substr(metatxt[7], 60,
                                            nchar(metatxt[7]))),
                 # Lambert 93 localisation
-                L93X_m_IN=as.numeric(substr(metatxt[16], 65, 77)),
-                L93X_m_BH=as.numeric(substr(metatxt[16], 38, 50)),
-                L93Y_m_IN=as.numeric(substr(metatxt[16], 79, 90)),
-                L93Y_m_BH=as.numeric(substr(metatxt[16], 52, 63)),
+                # L93X_m_IN=as.numeric(substr(metatxt[16], 65, 77)),
+                XL93_m=as.numeric(substr(metatxt[16], 38, 50)),
+                # L93Y_m_IN=as.numeric(substr(metatxt[16], 79, 90)),
+                YL93_m=as.numeric(substr(metatxt[16], 52, 63)),
 
                 # Surface
-                surface_km2_IN=as.numeric(substr(metatxt[19], 52, 63)),
-                surface_km2_BH=as.numeric(substr(metatxt[19], 38, 50)),
+                # surface_km2_IN=as.numeric(substr(metatxt[19], 52, 63)),
+                Surface_km2=as.numeric(substr(metatxt[19], 38, 50)),
 
                 # Elevation
-                altitude_m_IN=as.numeric(substr(metatxt[20], 52, 63)),
-                altitude_m_BH=as.numeric(substr(metatxt[20], 38, 50)),
+                # altitude_m_IN=as.numeric(substr(metatxt[20], 52, 63)),
+                Altitude_m=as.numeric(substr(metatxt[20], 38, 50)),
 
                 # Start and end of the data
                 debut=substr(metatxt[25], 38, 50),
@@ -530,10 +531,10 @@ extract_meta = function (computer_data_path, filedir, filename,
                 # The path to the data file of BH
                 file_path=file_path)
         
-        meta$surface_km2_BH[(meta$surface_km2_BH) <= 0] = NA
-        meta$surface_km2_IN[(meta$surface_km2_BH) <= 0] = NA
-        meta$altitude_m_BH[(meta$altitude_m_BH) < 0] = NA
-        meta$altitude_m_IN[(meta$altitude_m_BH) < 0] = NA
+        meta$Surface_km2[(meta$Surface_km2) <= 0] = NA
+        # meta$surface_km2_IN[(meta$surface_km2_BH) <= 0] = NA
+        meta$Altitude_m[(meta$Altitude_m) < 0] = NA
+        # meta$altitude_m_IN[(meta$altitude_m_BH) < 0] = NA
 
         Ltmp = names(iRegHydro())[nchar(names(iRegHydro())) == 2]
         Ltmp = substr(Ltmp, 1, 1)
@@ -552,7 +553,7 @@ extract_meta = function (computer_data_path, filedir, filename,
         }
         
         # Adding of the hydrological region
-        meta$region_hydro = RH
+        meta$Region_Hydro = RH
         return (meta)
 
     } else {

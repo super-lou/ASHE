@@ -381,3 +381,9 @@ read_tibbleFST = function (filedir, filename) {
     df = tibble(fst::read_fst(filepath))
     return (df)
 }
+
+read_shp = function (path) {
+    shp = st_read(path)
+    shp = st_transform(shp, 2154) 
+    return (shp)
+}
