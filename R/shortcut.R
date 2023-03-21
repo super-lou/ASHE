@@ -234,3 +234,14 @@ get_Nspace = function (data_code, unit, lim_pct, NspaceMax=NULL) {
         return (Nspace)
     }
 }
+
+
+post = function(x, verbose, ...) {
+    if (verbose) {
+        if (MPI) {
+            print(paste0(rank, " > ", x), ...)
+        } else {
+            print(x, ...)
+        }
+    }
+}
