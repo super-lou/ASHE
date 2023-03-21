@@ -236,7 +236,7 @@ get_Nspace = function (data_code, unit, lim_pct, NspaceMax=NULL) {
 }
 
 
-post = function(x, verbose, ...) {
+post = function(x, ...) {
     if (verbose) {
         if (MPI) {
             print(paste0(rank, " > ", x), ...)
