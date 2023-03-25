@@ -43,7 +43,7 @@ write_tibble = function (tbl, filedir="./", filename='data.txt') {
 
     } else {
         if (format == "fst") {
-            fst::write_fst(tbl, filepath, compress=0)
+            fst::write_fst(tbl, filepath, compress=100)
 
         } else if (format == "Rdata") {
             save(tbl, file=filepath)
@@ -150,7 +150,7 @@ write_dataFST = function (data, resdir, filedir='fst',
         dir.create(outdir, recursive=TRUE)
     }
     outfile = file.path(outdir, filename)
-    fst::write_fst(data, outfile, compress=0)
+    fst::write_fst(data, outfile, compress=100)
 }
 
 
