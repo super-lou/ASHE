@@ -557,7 +557,7 @@ extract_meta = function (computer_data_path, filedir, filename,
         return (meta)
 
     } else {
-        print(paste('filepath', file_path, 'do not exist'))
+        warning (paste('filepath', file_path, 'do not exist'))
         return (dplyr::tibble())
     }
 }
