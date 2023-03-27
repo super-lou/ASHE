@@ -21,7 +21,31 @@
 
 
 ## 1. WRITING ________________________________________________________
-write_tibble = function (tbl, filedir="./", filename='data.txt') {
+#' @title write_tibble
+#' @description Writes a [dplyr::tibble()] or a list of [dplyr::tibble()].
+#' @param tbl *[dplyr::tibble()]* [dplyr::tibble()] to write.
+#' @param filedir *tibble, default="./"* Directory to write the file.
+#' @param filename *character, default="data.txt"* Name of the file to write.
+#' @details This set of [read_tibble()] and [write_tibble()] functions support `.Rdata`, `.txt` and `.fst` format.
+#' @examples
+#' ```
+#' # load data
+#' data("iris")
+#' # convert data
+#' iris = dplyr::tibble(iris)
+#' iris$Species = as.character(iris$Species)
+#' 
+#' # writes a tibble
+#' write_tibble(iris, filedir="./", filename="iris.txt")
+#' # or a list of tibble
+#' iris_setosa = iris[iris$Species == "setosa",]
+#' iris_virginica = iris[iris$Species == "virginica",]
+#' iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
+#' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+#' ```
+#' @md
+#' @export
+write_tibble = function (tbl, filedir="./", filename="data.txt") {
 
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
@@ -155,6 +179,35 @@ write_dataFST = function (data, resdir, filedir='fst',
 
 
 ## 2. READING ________________________________________________________
+#' @title read_tibble
+#' @description Reads a file previously writed with [write_tibble()] and return a [dplyr::tibble()] or a list of [dplyr::tibble()].
+#' @param filepath *character, default=NULL* Path to the file to read.
+#' @param filedir *character, default="./"* Directory to the file to read.
+#' @param filename *character, default="data.txt"* Name of the file to read.
+#' @details This set of [read_tibble()] and [write_tibble()] functions support `.Rdata`, `.txt` and `.fst` format.
+#' @examples
+#' ```
+#' # load data
+#' data("iris")
+#' # convert data
+#' iris = dplyr::tibble(iris)
+#' iris$Species = as.character(iris$Species)
+#' 
+#' # writes a tibble
+#' write_tibble(iris, filedir="./", filename="iris.txt")
+#' # or a list of tibble
+#' iris_setosa = iris[iris$Species == "setosa",]
+#' iris_virginica = iris[iris$Species == "virginica",]
+#' iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
+#' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+#' 
+#' # read with a path
+#' read_tibble(filepath="iris.txt")
+#' # or with a directory and a filename
+#' read_tibble(filedir="./", filename="iris_selection.txt")
+#' ```
+#' @md
+#' @export
 read_tibble = function (filepath=NULL,
                         filedir="./", filename="data.txt") {
     

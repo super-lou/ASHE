@@ -4,7 +4,7 @@
 \alias{get_break}
 \title{Break}
 \usage{
-get_break(data, df_meta, level = 0.1)
+get_break(data, meta, level = 0.1)
 }
 \description{
 Break

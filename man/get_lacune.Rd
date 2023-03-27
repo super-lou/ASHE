@@ -4,7 +4,7 @@
 \alias{get_lacune}
 \title{Time gap}
 \usage{
-get_lacune(data, df_meta)
+get_lacune(data, meta)
 }
 \description{
 Time gap
