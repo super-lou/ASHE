@@ -7,11 +7,11 @@
 write_tibble(tbl, filedir = "./", filename = "data.txt")
 }
 \arguments{
-\item{tbl}{\emph{\code{\link[dplyr:reexports]{dplyr::tibble()}}} \code{\link[dplyr:reexports]{dplyr::tibble()}} to write.}
+\item{tbl}{\code{\link[dplyr:reexports]{dplyr::tibble()}} to write.}
 
-\item{filedir}{\emph{tibble, default="./"} Directory to write the file.}
+\item{filedir}{\emph{tibble, default="./"}   Directory to write the file.}
 
-\item{filename}{\emph{character, default="data.txt"} Name of the file to write.}
+\item{filename}{\emph{character, default="data.txt"}   Name of the file to write.}
 }
 \description{
 Writes a \code{\link[dplyr:reexports]{dplyr::tibble()}} or a list of \code{\link[dplyr:reexports]{dplyr::tibble()}}.
@@ -20,7 +20,6 @@ Writes a \code{\link[dplyr:reexports]{dplyr::tibble()}} or a list of \code{\link
 This set of \code{\link[=read_tibble]{read_tibble()}} and \code{\link[=write_tibble]{write_tibble()}} functions support \code{.Rdata}, \code{.txt} and \code{.fst} format.
 }
 \examples{
-```
 # load data
 data("iris")
 # convert data
@@ -34,5 +33,4 @@ iris_setosa = iris[iris$Species == "setosa",]
 iris_virginica = iris[iris$Species == "virginica",]
 iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
 write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
-```
 }

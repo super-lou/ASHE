@@ -7,11 +7,11 @@
 read_tibble(filepath = NULL, filedir = "./", filename = "data.txt")
 }
 \arguments{
-\item{filepath}{\emph{character, default=NULL} Path to the file to read.}
+\item{filepath}{\emph{character, default=NULL}   Path to the file to read.}
 
-\item{filedir}{\emph{character, default="./"} Directory to the file to read.}
+\item{filedir}{\emph{character, default="./"}   Directory to the file to read.}
 
-\item{filename}{\emph{character, default="data.txt"} Name of the file to read.}
+\item{filename}{\emph{character, default="data.txt"}   Name of the file to read.}
 }
 \description{
 Reads a file previously writed with \code{\link[=write_tibble]{write_tibble()}} and return a \code{\link[dplyr:reexports]{dplyr::tibble()}} or a list of \code{\link[dplyr:reexports]{dplyr::tibble()}}.
@@ -20,7 +20,6 @@ Reads a file previously writed with \code{\link[=write_tibble]{write_tibble()}} 
 This set of \code{\link[=read_tibble]{read_tibble()}} and \code{\link[=write_tibble]{write_tibble()}} functions support \code{.Rdata}, \code{.txt} and \code{.fst} format.
 }
 \examples{
-```
 # load data
 data("iris")
 # convert data
@@ -39,5 +38,4 @@ write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
 read_tibble(filepath="iris.txt")
 # or with a directory and a filename
 read_tibble(filedir="./", filename="iris_selection.txt")
-```
 }
