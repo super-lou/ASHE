@@ -384,6 +384,7 @@ convert_regexp = function (computer_data_path, filedir, filename) {
     # Get all the filename in the data directory selected
     filelist_dir = list.files(file.path(computer_data_path,
                                         filedir))
+
     filelist = c()
     for (f in filename) {
         # Get the file path to the data
@@ -391,11 +392,16 @@ convert_regexp = function (computer_data_path, filedir, filename) {
         if (file.exists(file_path)) {
             filelist = c(filelist, f) 
         } else {
+            filelist_tmp = filelist_dir[grepl(f, filelist_dir)]
+            if (length(filelist_tmp) == 0) {
+                filelist_tmp = f
+            }
             filelist = c(filelist,
-                         filelist_dir[grepl(f, filelist_dir)])
+                         filelist_tmp)
         }
     }
-    Code = gsub("[_].*$", "", filelist)
+    # Code = gsub("[_].*$", "", filelist)
+    Code = filelist
     return (Code)
 }
 
