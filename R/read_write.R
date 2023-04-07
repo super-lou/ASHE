@@ -250,7 +250,11 @@ read_tibble = function (filepath=NULL,
                                               quote='"'))
             for (j in 1:ncol(tbl)) {
                 if (is.factor(tbl[[j]])) {
-                    d = try(as.Date(tbl[[1, j]], format="%Y-%m-%d"))
+                    d = try(as.Date(tbl[[1, j]],
+                                    tryFormats=c("%Y-%m-%d",
+                                                 "%Y/%m/%d",
+                                                 "%Y%m%d")),
+                            silent=TRUE)
                     test = nchar(as.character(tbl[[1, j]])) > 10
                     if("try-error" %in% class(d) || is.na(d) | test) {
                         tbl[j] = as.character(tbl[[j]])

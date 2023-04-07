@@ -380,7 +380,8 @@ get_selection_DOCX = function (computer_data_path, listdir, listname,
 ## 3. EXTRACTION _____________________________________________________
 #' @title Convert regexp in selection
 #' @export
-convert_regexp = function (computer_data_path, filedir, filename) {
+convert_regexp = function (computer_data_path, filedir,
+                           filename, obs_format) {
     # Get all the filename in the data directory selected
     filelist_dir = list.files(file.path(computer_data_path,
                                         filedir))
@@ -400,8 +401,9 @@ convert_regexp = function (computer_data_path, filedir, filename) {
                          filelist_tmp)
         }
     }
-    # Code = gsub("[_].*$", "", filelist)
-    Code = filelist
+    Code = gsub(paste0(gsub("[_]", "[_]", obs_format), ".*$"),
+                "", filelist)
+    # Code = filelist
     return (Code)
 }
 
