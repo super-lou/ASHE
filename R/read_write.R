@@ -205,7 +205,7 @@ write_dataFST = function (data, resdir, filedir='fst',
 #' @md
 #' @export
 read_tibble = function (filepath=NULL,
-                        filedir="./", filename="data.txt") {
+                        filedir="./", filename="data.txt", ...) {
     
     if (is.null(filepath) & !is.null(filedir) & !is.null(filename)) {
         filepath = file.path(filedir, filename)
@@ -247,7 +247,8 @@ read_tibble = function (filepath=NULL,
             tbl = dplyr::as_tibble(read.table(file=filepath,
                                               header=TRUE,
                                               sep=";",
-                                              quote='"'))
+                                              quote='"',
+                                              ...))
             for (j in 1:ncol(tbl)) {
                 if (is.factor(tbl[[j]])) {
                     d = try(as.Date(tbl[[1, j]],
