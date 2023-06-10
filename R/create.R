@@ -678,7 +678,7 @@ extract_data = function (computer_data_path, filedir, filename,
                 data[j] = as.numeric(as.character(data[[j]]))
             }
         }
-
+        
         if (!is.null(val2keep)) {
             data = dplyr::mutate(data,
                                  Date=as.Date(as.character(data$Date),
