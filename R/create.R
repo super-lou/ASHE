@@ -421,7 +421,7 @@ convert_regexp = function (computer_data_path, filedir,
 #' printed (default : TRUE).
 #' @return A tibble containing metadata about selected stations.
 #' @export
-create_meta = function (computer_data_path, filedir, filename,
+create_meta_HYDRO = function (computer_data_path, filedir, filename,
                          verbose=TRUE) {
     
     # Convert the filename in vector
@@ -466,7 +466,7 @@ create_meta = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             meta = rbind(meta,
-                            create_meta(computer_data_path, 
+                            create_meta_HYDRO(computer_data_path, 
                                          filedir, 
                                          f,
                                          verbose=FALSE))
@@ -570,7 +570,7 @@ create_meta = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# meta = create_meta(
+# meta = create_meta_HYDRO(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     "BanqueHydro_Export2021",
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
@@ -589,7 +589,7 @@ create_meta = function (computer_data_path, filedir, filename,
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
 #' @export
-create_data = function (computer_data_path, filedir, filename,
+create_data_HYDRO = function (computer_data_path, filedir, filename,
                          val2keep=NULL,
                          verbose=TRUE) {
     
@@ -634,7 +634,7 @@ create_data = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             data = rbind(data,
-                         create_data(computer_data_path=computer_data_path, 
+                         create_data_HYDRO(computer_data_path=computer_data_path, 
                                       filedir=filedir, 
                                       filename=f,
                                       val2keep=val2keep,
@@ -666,7 +666,7 @@ create_data = function (computer_data_path, filedir, filename,
                           skip=41)
 
         # Create all the metadata for the station
-        meta = create_meta(computer_data_path, filedir, filename,
+        meta = create_meta_HYDRO(computer_data_path, filedir, filename,
                                verbose=FALSE)
         # Get the code of the station
         code = meta$Code
@@ -711,7 +711,7 @@ create_data = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# data = create_data(
+# data = create_data_HYDRO(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     '',
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
