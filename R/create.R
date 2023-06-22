@@ -23,7 +23,7 @@
 # Regroups functions to generation of generical station selection
 # according to pre-existing directory of data or specific other
 # selection format as '.docx' file from Agence de l'eau Adour-Garonne.
-# Also useful to extract the data and the metadata present in the
+# Also useful to create the data and the metadata present in the
 # Banque Hydro files from a selection of station. Manages also
 # shapefiles loading.
 
@@ -184,7 +184,7 @@ copy_selection = function (select_dir, select_file, from_dir, to_dir,
     }
     
     select_path = file.path(select_dir, select_file)
-    # Extracts the data as a data frame
+    # Creates the data as a data frame
     Code = read.table(select_path,
                       header=TRUE,
                       encoding='UTF-8',
@@ -257,7 +257,7 @@ create_selection = function (computer_data_path, filedir, outname,
     for (f in filelist_tmp) {
         # If the filename is a 'txt' file
             if (tools::file_ext(f) == 'txt') {
-                # Extracts the station code
+                # Creates the station code
                 code = gsub("[^[:alnum:] ].*$", '', f)
                 # Then the station code is stored
                 codelist = c(codelist, code)
@@ -293,7 +293,7 @@ get_selection_TXT = function (computer_data_path, listdir, listname) {
     
     # Gets the file path to the data
     list_path = file.path(computer_data_path, listdir, listname)
-    # Extracts the data as a data frame
+    # Creates the data as a data frame
     filename = read.table(list_path,
                           header=FALSE,
                           encoding='UTF-8',
@@ -377,7 +377,7 @@ get_selection_DOCX = function (computer_data_path, listdir, listname,
     # "Liste-station_RRSE.docx")
 
 
-## 3. EXTRACTION _____________________________________________________
+## 3. CREATEION _____________________________________________________
 #' @title Convert regexp in selection
 #' @export
 convert_regexp = function (computer_data_path, filedir,
@@ -407,21 +407,21 @@ convert_regexp = function (computer_data_path, filedir,
     return (Code)
 }
 
-### 3.1. Extraction of metadata ______________________________________
-#' @title Extract metadata
-#' @description Extraction of metadata of stations.
+### 3.1. Creation of metadata ______________________________________
+#' @title Create metadata
+#' @description Creation of metadata of stations.
 #' @param computer_data_path Path to the data.
 #' @param filedir Directory of Banque HYDRO data you want to use in
 #' ASHE\\computer_data_path\\ to get station codes. If "" is
 #' use, data will be search in ASHE\\computer_data_path\\.
 #' @param filename String or vector of string of all filenames from
-#' which metadata will be extracted. If set to 'all', all the file in
+#' which metadata will be created. If set to 'all', all the file in
 #' 'fildir' will be use.
 #' @param verbose Boolean to indicate if more processing info are
 #' printed (default : TRUE).
 #' @return A tibble containing metadata about selected stations.
 #' @export
-extract_meta = function (computer_data_path, filedir, filename,
+create_meta = function (computer_data_path, filedir, filename,
                          verbose=TRUE) {
     
     # Convert the filename in vector
@@ -466,7 +466,7 @@ extract_meta = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             meta = rbind(meta,
-                            extract_meta(computer_data_path, 
+                            create_meta(computer_data_path, 
                                          filedir, 
                                          f,
                                          verbose=FALSE))
@@ -484,7 +484,7 @@ extract_meta = function (computer_data_path, filedir, filename,
 
     if (file.exists(file_path) & substr(file_path, nchar(file_path),
                                         nchar(file_path)) != '/') {
-        # Extract all the header
+        # Create all the header
         metatxt = c(readLines(file_path, n=41, encoding="UTF-8"))
 
         # print(metatxt[11])
@@ -570,26 +570,26 @@ extract_meta = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# meta = extract_meta(
+# meta = create_meta(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     "BanqueHydro_Export2021",
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
 
-### 3.2. Extraction of data __________________________________________
-#' @title Extract data
-#' @description Extraction of data of stations.
+### 3.2. Creation of data __________________________________________
+#' @title Create data
+#' @description Creation of data of stations.
 #' @param computer_data_path Path to the data.
 #' @param filedir Directory of Banque HYDRO data you want to use in
 #' ASHE\\computer_data_path\\ to get station codes. If "" is
 #' use, data will be search in ASHE\\computer_data_path\\.
 #' @param filename String or vector of string of all filenames from
-#' which data will be extracted. If set to 'all', all the file in
+#' which data will be created. If set to 'all', all the file in
 #' 'fildir' will be use.
 #' @param verbose Boolean to indicate if more processing info are
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
 #' @export
-extract_data = function (computer_data_path, filedir, filename,
+create_data = function (computer_data_path, filedir, filename,
                          val2keep=NULL,
                          verbose=TRUE) {
     
@@ -634,7 +634,7 @@ extract_data = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             data = rbind(data,
-                         extract_data(computer_data_path=computer_data_path, 
+                         create_data(computer_data_path=computer_data_path, 
                                       filedir=filedir, 
                                       filename=f,
                                       val2keep=val2keep,
@@ -650,7 +650,7 @@ extract_data = function (computer_data_path, filedir, filename,
     
     # Print metadata if asked
     if (verbose) {
-        print(paste("Extraction of BH data for file :", filename))
+        print(paste("Creation of BH data for file :", filename))
     }
 
     # Get the file path to the data
@@ -658,15 +658,15 @@ extract_data = function (computer_data_path, filedir, filename,
     
     if (file.exists(file_path) & substr(file_path, nchar(file_path),
                                         nchar(file_path)) != '/') {
-        # Extract the data as a data frame
+        # Create the data as a data frame
         data = read.table(file_path,
                           header=TRUE,
                           na.strings=c('     -99', ' -99.000'),
                           sep=';',
                           skip=41)
 
-        # Extract all the metadata for the station
-        meta = extract_meta(computer_data_path, filedir, filename,
+        # Create all the metadata for the station
+        meta = create_meta(computer_data_path, filedir, filename,
                                verbose=FALSE)
         # Get the code of the station
         code = meta$Code
@@ -711,14 +711,14 @@ extract_data = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# data = extract_data(
+# data = create_data(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     '',
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
 
-### 3.3. Extraction of climate data and metadata _____________________
-#' @title Extract climate data
-#' @description Extraction of climate data and metadata
+### 3.3. Creation of climate data and metadata _____________________
+#' @title Create climate data
+#' @description Creation of climate data and metadata
 #' @param computer_data_path Path to the data.
 #' @param filedir Directory of data you want to use in
 #' ASHE\\computer_data_path\\ to get climate data. If "" is
@@ -729,7 +729,7 @@ extract_data = function (computer_data_path, filedir, filename,
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
 #' @export
-extract_climate_data = function (computer_data_path, filedir,
+create_climate_data = function (computer_data_path, filedir,
                                 colNames=c('Date', 'PRCP_mm',
                                            'PET_mm', 'T_degC'),
                                 verbose=TRUE) {
@@ -745,7 +745,7 @@ extract_climate_data = function (computer_data_path, filedir,
     
     for (i in 1:nfile) {
         file_path = file.path(dirpath, filelist[i])
-        # Extract the data as a data frame
+        # Create the data as a data frame
         data_basin = read.table(file_path,
                                     header=FALSE,
                                     sep=' ',
@@ -761,6 +761,6 @@ extract_climate_data = function (computer_data_path, filedir,
     return (res)
 }
 # Example
-# res = extract_climate_data(
+# res = create_climate_data(
     # "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
     # 'climate')
