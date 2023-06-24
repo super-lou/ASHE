@@ -736,6 +736,9 @@ create_climate_data = function (computer_data_path, filedir,
 
     dirpath = file.path(computer_data_path, filedir)
     filelist = list.files(dirpath)
+
+    print(dirpath)
+    print(filelist)
     
     basin = gsub("[^[:alnum:] ].*$", '', filelist)
     
@@ -747,9 +750,9 @@ create_climate_data = function (computer_data_path, filedir,
         file_path = file.path(dirpath, filelist[i])
         # Create the data as a data frame
         data_basin = read.table(file_path,
-                                    header=FALSE,
-                                    sep=' ',
-                                    skip=1)
+                                header=FALSE,
+                                sep=' ',
+                                skip=1)
 
         data_basin$Code = basin[i]
 

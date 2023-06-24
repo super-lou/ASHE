@@ -23,70 +23,62 @@
 ## 1. EXTREMES OF VALUE FOR ALL STATION ______________________________
 #' @title Extremes
 #' @export
-get_valueExtremes = function (list_df2plot, Code, nPeriod,
-                              nbVar, nCode, valueType="trend",
+get_valueExtremes = function (dataEX, trendEX,
+                              mean_period=NULL,
                               colorForce=FALSE,
-                              minXprob=0, maxXprob=1) {
-    
-    # Blank array to store mean of the trend for each
-    # station, perdiod and variable
-    X_code = array(rep(1, nPeriod*nbVar*nCode),
-                       dim=c(nPeriod, nbVar, nCode))
+                              minProb=0, maxProb=1) {
 
-    if (valueType == "break") {
-        dataMeantmp = array(rep(NA, nbVar*nCode),
-                            dim=c(nbVar, nCode))
+    Code = levels(facotr(dataEX$Code))
+    nCode = length(Code)
+    Period = unique(trendEX$period)
+    nPeriod = length(Period)
+    Var =  levels(factor(trendEX$var))
+    nVar = length(Var)
+    
+    X_code = array(rep(1, nPeriod*nVar*nCode),
+                   dim=c(nPeriod, nVar, nCode))
+
+    if (!is.null(mean_period)) {
+        dataMeantmp = array(rep(NA, nVar*nCode),
+                            dim=c(nVar, nCode))
     }
 
-    # For all the period
     for (j in 1:nPeriod) {
-        # For all the code
+        period = Period[[j]]
+
         for (k in 1:nCode) {
-            # Gets the code
             code = Code[k]
             
-            for (i in 1:nbVar) {
-                unit = list_df2plot[[i]]$unit
-                level = list_df2plot[[i]]$level
-                # Extracts the data corresponding to the
-                # current variable
-                data = list_df2plot[[i]]$data
-                # Extracts the data corresponding to the code
-                data_code = data[data$Code == code,]
+            for (i in 1:nVar) {
+                var = Var[i]
+                unit = metaEX$unit
 
-                if (valueType == "break") {
-                    # Get the current start and end of the sub period
+                if (!is.null(mean_period)) {
                     Start = mean_period[[j]][1]
                     End = mean_period[[j]][2]
-
-                }
-                
-                if (valueType == "trend") {
-                    # Extracts the trend corresponding to the
-                    # current variable
-                    df_trend = list_df2plot[[i]]$trend
-                    df_trend_code = df_trend[df_trend$Code == code,]
-                                    # Extract start and end of trend periods
-                    Start = df_trend_code$start[j]
-                    End = df_trend_code$end[j]
-                    # Same for trend
-                    df_trend_code_per = 
-                        df_trend_code[df_trend_code$start == Start 
-                                      & df_trend_code$end == End,]
+                    
+                } else {
+                    trendEX_period_code_var =
+                        trendEX[sapply(lapply(trendEX$period,
+                                              '==', period), all) &
+                                trendEX$Code == code &
+                                trendEX$var == var,]
+                    Start = period[1]
+                    End = period[2]
                 }
                 
                 # Extracts the corresponding data for the period
-                data_code_per =
-                    data_code[data_code$Date >= Start 
-                                 & data_code$Date <= End,]
+                dataEX_period_code = dataEX[dataEX$Date >= Start &
+                                            dataEX$Date <= End &
+                                            dataEX$Code == code,]
 
-                if (valueType == "break") {
+                if (!is.null(mean_period)) {
                     # Min max for the sub period
-                    Datemin = min(data_code_per$Date)
-                    Datemax = max(data_code_per$Date)
+                    Datemin = min(dataEX_period_code$Date, na.rm=TRUE)
+                    Datemax = max(dataEX_period_code$Date, na.rm=TRUE)
 
                     # Mean of the flow over the sub period
-                    dataMean = mean(data_code_per$X,
+                    dataMean = mean(dataEX_period_code[[var]],
                                     na.rm=TRUE)
 
                     # If this in not the first period
@@ -114,30 +106,30 @@ get_valueExtremes = function (list_df2plot, Code, nPeriod,
                     X_code[j, i, k] = value
                     # Stores temporarily the mean of the current period
                     dataMeantmp[i, k] = dataMean
-                }
 
-                if (valueType == "trend") {
+                } else {
                     # Computes the number of trend analysis selected
-                    Ntrend = nrow(df_trend_code_per)
+                    Ntrend = nrow(trendEX_period_code_var)
                     # If there is more than one trend on the same period
                     if (Ntrend > 1) {
                         # Takes only the first because they are similar
-                        df_trend_code_per = df_trend_code_per[1,]
+                        trendEX_period_code_var = trendEX_period_code_var[1,]
                     }
                     
                     # If it is a flow variable
                     if (unit == 'hm^{3}' | unit == 'm^{3}.s^{-1}') {
                         # Computes the mean of the data on the period
-                        dataMean = mean(data_code_per$X, na.rm=TRUE)
+                        dataMean = mean(dataEX_period_code[[var]], na.rm=TRUE)
                         # Normalises the trend value by the mean of the data
-                        value = df_trend_code_per$a / dataMean
+                        value = trendEX_period_code_var$a / dataMean
                         # If it is a date variable
                     } else if (unit == "jour" | unit == "jour de l'année" | unit == 'jour.an^{-1}') {
-                        value = df_trend_code_per$a
+                        value = trendEX_period_code_var$a
                     }
 
                     # If the p value is under the threshold
-                    if (df_trend_code_per$p <= level | colorForce) {
+                    if (trendEX_period_code_var$p <= trendEX_period_code_varlevel |
+                        colorForce) {
                         # Stores the mean trend
                         X_code[j, i, k] = value
                         # Otherwise
@@ -153,13 +145,13 @@ get_valueExtremes = function (list_df2plot, Code, nPeriod,
     # Computes the min and the max of the averaged trend for
     # all the station
     minX = apply(X_code, c(1, 2),
-                     quantile, probs=minXprob, na.rm=TRUE)
+                 quantile, probs=minProb, na.rm=TRUE)
     maxX = apply(X_code, c(1, 2),
-                     quantile, probs=maxXprob, na.rm=TRUE)
+                 quantile, probs=maxProb, na.rm=TRUE)
     res = list(value=X_code, min=minX, max=maxX)
     return (res)
 }
-
+    
 
 get_Nspace = function (data_code, unit, lim_pct, NspaceMax=NULL) {
     
