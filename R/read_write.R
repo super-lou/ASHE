@@ -70,7 +70,7 @@ write_tibble = function (tbl, filedir="./", filename="data.txt") {
         } else if (format == "Rdata") {
             save(tbl, file=filepath)
             
-        } else if (format == "txt") {
+        } else if (format %in% c("csv", "txt")) {
             write.table(tbl,
                         file=filepath,
                         sep=";",
@@ -243,7 +243,7 @@ read_tibble = function (filepath=NULL,
             tbl = as_tibble(tbl)
             rm (tmp)
             
-        } else if (format == "txt") {
+        } else if (format %in% c("csv", "txt")) {
             tbl = dplyr::as_tibble(read.table(file=filepath,
                                               header=TRUE,
                                               sep=";",
