@@ -678,6 +678,8 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                 data[j] = as.numeric(as.character(data[[j]]))
             }
         }
+
+        print(data$Qls)
         
         if (!is.null(val2keep)) {
             data = dplyr::mutate(data,
