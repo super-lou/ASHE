@@ -679,14 +679,12 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             }
         }
 
-        print(data$Qls)
-        
         if (!is.null(val2keep)) {
             data = dplyr::mutate(data,
                                  Code=code,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
-                                 Q=data$Qls*1E-3,
+                                 Q=as.numeric(data$Qls)*1E-3,
                                  !!rlang::data_sym(names(val2keep)),
                                  .keep="used")
 
@@ -702,7 +700,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                                  Code=code,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
-                                 Q=data$Qls*1E-3,
+                                 Q=as.numeric(data$Qls)*1E-3,
                                  .keep="used")
         }
         return (data)
