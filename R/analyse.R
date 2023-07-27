@@ -24,6 +24,7 @@
 ## 1. HYDROGRAPH _____________________________________________________
 hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
                                   check=FALSE) {
+
     xref = matrix(
         c(0.099, 0.100, 0.101, 0.099, 0.088, 0.078, 0.072, #1
           0.064, 0.064, 0.069, 0.076, 0.089,
@@ -198,7 +199,7 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
 #' @export
 find_regimeHydro = function (dataEXserieQM,
                              lim_number=NULL,
-                             dataEXseriePA=NULL
+                             dataEXseriePAs_r=NULL
                              ) {
     
     if (!is.null(dataEXseriePA)) {
@@ -206,14 +207,14 @@ find_regimeHydro = function (dataEXserieQM,
             dplyr::summarise(dplyr::group_by(dataEXseriePA,
                                              Code),
                              isPluvial=mean(PAs, na.rm=TRUE) <
-                                 0.05*mean(PA, na.rm=TRUE),
+                                 0.15*mean(PA, na.rm=TRUE),
                              isSnow=mean(PAs, na.rm=TRUE) >=
-                                 0.05*mean(PA, na.rm=TRUE),
+                                 0.15*mean(PA, na.rm=TRUE),
                              .groups="drop")
         isMOD$forceId = NA
         isMOD$forceIdIf = NA
-        isMOD$forceId[isMOD$isPluvial] = list(1:7)
-        isMOD$forceId[isMOD$isSnow] = list(7:9)
+        isMOD$forceId[isMOD$isPluvial] = list(1:6)
+        isMOD$forceId[isMOD$isSnow] = list(7:12)
         isMOD$forceIdIf[isMOD$isSnow] = list(1:3)
         dataEXserieQM = dplyr::full_join(dataEXserieQM,
                                          dplyr::select(isMOD,
@@ -234,7 +235,7 @@ find_regimeHydro = function (dataEXserieQM,
                                                    forceId[[1]],
                                                    forceIdIf[[1]])),
                          .groups="drop")
-
+    
     if (!is.null(lim_number)) {
         find_nearest = function (id, Id, lim_number) {
             nId = table(Id)
