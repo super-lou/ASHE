@@ -205,8 +205,8 @@ find_regimeHydro = function (dataEXserieQM,
     if (!is.null(dataEXserieP_r)) {
         isMOD =
             dplyr::mutate(dataEXserieP_r,
-                          isPluvial=Ps_r < 0.15,
-                          isSnow=Ps_r >= 0.15)
+                          isPluvial=Ps_r < 0.1,
+                          isSnow=Ps_r >= 0.1)
 
         print(isMOD)
         isMOD$forceId = NA
