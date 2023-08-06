@@ -200,7 +200,7 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
 find_regimeHydro = function (dataEXserieQM,
                              lim_number=NULL,
                              dataEXserieP_r=NULL,
-                             threshold=0.03) {
+                             threshold=0.09) {
     
     if (!is.null(dataEXserieP_r)) {
         isMOD =
