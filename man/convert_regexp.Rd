@@ -4,7 +4,7 @@
 \alias{convert_regexp}
 \title{Convert regexp in selection}
 \usage{
-convert_regexp(computer_data_path, filedir, filename)
+convert_regexp(computer_data_path, filedir, filename, obs_format)
 }
 \description{
 Convert regexp in selection

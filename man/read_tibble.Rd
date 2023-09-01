@@ -4,7 +4,7 @@
 \alias{read_tibble}
 \title{read_tibble}
 \usage{
-read_tibble(filepath = NULL, filedir = "./", filename = "data.txt")
+read_tibble(filepath = NULL, filedir = "./", filename = "data.txt", ...)
 }
 \arguments{
 \item{filepath}{\emph{character, default=NULL}   Path to the file to read.}

@@ -4,7 +4,12 @@
 \alias{find_regimeHydro}
 \title{Hydrograph}
 \usage{
-find_regimeHydro(dataEXserieQM, lim_number = NULL, dataEXseriePA = NULL)
+find_regimeHydro(
+  dataEXserieQM,
+  lim_number = NULL,
+  dataEXserieP_ratio = NULL,
+  threshold = 0.09
+)
 }
 \description{
 Hydrograph
