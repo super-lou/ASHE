@@ -76,6 +76,8 @@ refCOL =
     EXPLORE2blue
 
 
+#' @title get_IPCC_Palette
+#' @export
 get_IPCC_Palette = function (palette_name, colorStep=NA, reverse=FALSE) {
     if (palette_name == "SSP") {
         Palette =
@@ -370,6 +372,8 @@ compute_colorBin = function (min, max, colorStep, center=NULL,
 #     if ()
 # }
 
+#' @title get_color
+#' @export
 get_color = function (value, upBin, lowBin, Palette,
                       include_min=FALSE,
                       include_max=TRUE,
@@ -420,6 +424,8 @@ get_color = function (value, upBin, lowBin, Palette,
     }
 }
 
+#' @title get_colors
+#' @export
 get_colors = function (Value, upBin, lowBin, Palette,
                        include_min=FALSE,
                        include_max=TRUE) {
