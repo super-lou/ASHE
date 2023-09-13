@@ -100,20 +100,6 @@ get_IPCC_Palette = function (palette_name, colorStep=NA, reverse=FALSE) {
               "#2A6863")
     }
 
-    if (palette_name == "MAKAHO_ground") {
-        Palette =
-            c("#543005",
-              "#8C510A",
-              "#BF812D",
-              "#DFC27D",
-              "#F6E8C3",
-              "#C7EAE5",
-              "#80CDC1",
-              "#35978F",
-              "#01665E",
-              "#003C30")
-    }
-
     if (palette_name == "ground_10") {
         Palette =
             c("#452C1A",
@@ -182,6 +168,49 @@ get_IPCC_Palette = function (palette_name, colorStep=NA, reverse=FALSE) {
         Palette =  
             c("#59141C",
               "#F9DDD5")
+    }
+
+
+    if (palette_name == "MAKAHO_hydro") {
+        Palette =
+            c("#543005",
+              "#8C510A",
+              "#BF812D",
+              "#DFC27D",
+              "#F6E8C3",
+              "#C7EAE5",
+              "#80CDC1",
+              "#35978F",
+              "#01665E",
+              "#003C30")
+    }
+
+    if (palette_name == "MAKAHO_temperature") {
+        Palette =
+            c("#67001F",
+              "#B2182B",
+              "#D6604D",
+              "#F4A582",
+              "#FDDBC7",
+              "#D1E5F0",
+              "#92C5DE",
+              "#4393C3",
+              "#2166AC",
+              "#053061")
+    }
+
+    if (palette_name == "MAKAHO_date") {
+        Palette =
+            c("#CD5629",
+              "#DC8C48",
+              "#E9BD6F",
+              "#F2D7B5",
+              "#F5E4E2",
+              "#EFE2E9",
+              "#EAC5DD",
+              "#E596C3",
+              "#BC66A5",
+              "#893687")
     }
     
     if (!is.na(colorStep)) {
