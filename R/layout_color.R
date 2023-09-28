@@ -230,7 +230,7 @@ get_IPCC_Palette = function (palette_name, colorStep=NA, reverse=FALSE) {
 ### 1.1. Personal theme ______________________________________________
 #' @title Ggplot2 theme ash
 #' @export
-theme_IPCC = function (isBack=TRUE, isGrid=TRUE, isTitle=FALSE,
+theme_IPCC = function (isBack=TRUE, isGridX=FALSE, isGridY=TRUE, isTitle=FALSE,
                        dTitle=0, isLabelX=FALSE, isLabelY=FALSE) {
 
     if (isBack) {
@@ -239,7 +239,14 @@ theme_IPCC = function (isBack=TRUE, isGrid=TRUE, isTitle=FALSE,
         panel.background=element_blank()
     }
 
-    if (isGrid) {
+    if (isGridX) {
+        panel.grid.major.x=element_line(color=IPCCgrey85,
+                                        size=0.25)
+    } else {
+        panel.grid.major.x=element_blank()
+    }
+
+    if (isGridY) {
         panel.grid.major.y=element_line(color=IPCCgrey85,
                                         size=0.25)
     } else {
@@ -283,7 +290,7 @@ theme_IPCC = function (isBack=TRUE, isGrid=TRUE, isTitle=FALSE,
                                       fill=NA,
                                       size=0.7),
             # Grid
-            panel.grid.major.x=element_blank(),
+            panel.grid.major.x=panel.grid.major.x,
             panel.grid.major.y=panel.grid.major.y,
             panel.grid.minor.x=element_blank(),
             panel.grid.minor.y=element_blank(),
