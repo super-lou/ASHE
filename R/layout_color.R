@@ -346,7 +346,7 @@ compute_colorBin = function (min, max, colorStep, center=NULL,
                              include=FALSE) {
 
     if (!is.null(center)) {
-        maxAbs = max(abs(max), abs(min))
+        maxAbs = max(abs(max-center), abs(min-center))
         minValue = -maxAbs + center
         maxValue = maxAbs + center
     } else {
