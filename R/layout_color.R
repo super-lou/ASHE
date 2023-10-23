@@ -270,7 +270,7 @@ theme_IPCC = function (isBack=TRUE, isGridX=FALSE, isGridY=TRUE, isTitle=FALSE,
     }
     
     if (isLabelY) {
-        axis.title.y=element_text(size=9,
+        axis.title.y=element_text(size=8,
                                   vjust=1.2, hjust=0.5,
                                   color=IPCCgrey25)
     } else {
