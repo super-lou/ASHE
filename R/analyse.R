@@ -218,19 +218,25 @@ find_regimeHydro = function (dataEXserieQM,
                                                          "forceId",
                                                          "forceIdIf")),
                                          by="Code")
+        regimeHydro =
+            dplyr::summarise(dplyr::group_by(dataEXserieQM,
+                                             Code),
+                             as_tibble(
+                                 hide_find_regimeHydro(QM,
+                                                       forceId[[1]],
+                                                       forceIdIf[[1]])),
+                             .groups="drop")
+        
     } else {
-        dataEXserieQM$forceId = NA
-        dataEXserieQM$forceIdIf = NA
+        regimeHydro =
+            dplyr::summarise(dplyr::group_by(dataEXserieQM,
+                                             Code),
+                             as_tibble(
+                                 hide_find_regimeHydro(QM)),
+                             .groups="drop")
     }
 
-    regimeHydro =
-        dplyr::summarise(dplyr::group_by(dataEXserieQM,
-                                         Code),
-                         as_tibble(
-                             hide_find_regimeHydro(QM,
-                                                   forceId[[1]],
-                                                   forceIdIf[[1]])),
-                         .groups="drop")
+
     
     if (!is.null(lim_number)) {
         find_nearest = function (id, Id, lim_number) {
@@ -318,7 +324,7 @@ get_break = function (data, meta, level=0.1) {
 get_lacune = function (data, meta) {
     
     # Get all different stations code
-    Code = rle(data$Code)$value
+    Code = levels(factor(data$Code))
     
     # Create new vector to stock results for cumulative and mean
     # time gap by station
@@ -334,6 +340,7 @@ get_lacune = function (data, meta) {
     for (code in Code) {   
         # Get only the data rows for the selected station
         data_code = data[data$Code==code,]
+        data_code = dplyr::filter(data_code, !duplicated(Date))
         # Get date for the selected station
         Date = data_code$Date
         # Get time span for the selection station
@@ -363,6 +370,6 @@ get_lacune = function (data, meta) {
     # Create tibble for lacune
     lac = tibble(Code=Code, tLac_pct=tLac_pct, meanLac=meanLac)
     # Join a tibble
-    meta = dplyr::full_join(meta, lac, by="Code")
+    meta = dplyr::left_join(meta, lac, by="Code")
     return (meta)
 }

@@ -234,84 +234,104 @@ float2frac = function (X, den) {
 #' @return A list of shapefiles converted as tibbles that can be plot
 #' with 'geom_polygon' or 'geom_path'.
 #' @export
-load_shapefile = function (computer_shp_path, Code,
-                           france_shp_path,
-                           basinHydro_shp_path,
-                           regionHydro_shp_path,
-                           secteurHydro_shp_path,
-                           entiteHydro_shp_path, entiteHydro_coord,
-                           entitePiezo_shp_path,
-                           river_shp_path,
-                           return_river=TRUE,
+load_shapefile = function (computer_shp_path, Code=NULL,
+                           france_shp_path=NULL,
+                           basinHydro_shp_path=NULL,
+                           regionHydro_shp_path=NULL,
+                           secteurHydro_shp_path=NULL,
+                           entiteHydro_shp_path=NULL, entiteHydro_coord=NULL,
+                           entitePiezo_shp_path=NULL,
+                           river_shp_path=NULL,
                            river_class=NULL,
                            river_length=NULL,
                            river_selection=NULL,
                            toleranceRel=10000) {
     
-    # Path for shapefile
-    france_path = file.path(computer_shp_path,
-                            france_shp_path)
-    basinHydro_path = file.path(computer_shp_path,
-                                basinHydro_shp_path)
-    regionHydro_path = file.path(computer_shp_path,
-                                 regionHydro_shp_path)
-    secteurHydro_path = file.path(computer_shp_path,
-                                  secteurHydro_shp_path)
-    entiteHydro_path = file.path(computer_shp_path,
-                                 entiteHydro_shp_path)
-    entitePiezo_path = file.path(computer_shp_path,
-                                 entitePiezo_shp_path)
-    river_path = file.path(computer_shp_path,
-                           river_shp_path)
-    
     # France
-    france = st_read(france_path)
-    france = st_union(france)
-    france = st_transform(france, 2154)
-    france = st_simplify(france,
-                         preserveTopology=TRUE,
-                         dTolerance=toleranceRel)
-    
-    # Hydrological basin
-    basinHydro = st_read(basinHydro_path)
-    basinHydro = st_transform(basinHydro, 2154)
-    basinHydro = st_simplify(basinHydro,
+    if (!is.null(france_shp_path)) {
+        france_path = file.path(computer_shp_path,
+                                france_shp_path)
+        france = st_read(france_path)
+        france = st_union(france)
+        france = st_transform(france, 2154)
+        france = st_simplify(france,
                              preserveTopology=TRUE,
-                             dTolerance=toleranceRel*0.6)
+                             dTolerance=toleranceRel)
+    } else {
+        france = NULL
+    }
+
+    # Hydrological basin
+    if (!is.null(basinHydro_shp_path)) {
+        basinHydro_path = file.path(computer_shp_path,
+                                    basinHydro_shp_path)
+        basinHydro = st_read(basinHydro_path)
+        basinHydro = st_transform(basinHydro, 2154)
+        basinHydro = st_simplify(basinHydro,
+                                 preserveTopology=TRUE,
+                                 dTolerance=toleranceRel*0.6)
+    } else {
+        basinHydro = NULL
+    }
     
     # Hydrological sub-basin
-    regionHydro = st_read(regionHydro_path)
-    regionHydro = st_transform(regionHydro, 2154)
-    regionHydro = st_simplify(regionHydro,
-                              preserveTopology=TRUE,
-                              dTolerance=toleranceRel*0.6)
-
+    if (!is.null(regionHydro_shp_path)) {
+        regionHydro_path = file.path(computer_shp_path,
+                                     regionHydro_shp_path)
+        regionHydro = st_read(regionHydro_path)
+        regionHydro = st_transform(regionHydro, 2154)
+        regionHydro = st_simplify(regionHydro,
+                                  preserveTopology=TRUE,
+                                  dTolerance=toleranceRel*0.6)
+    } else {
+        regionHydro = NULL
+    }
+    
     # Hydrological sector
-    secteurHydro = st_read(secteurHydro_path)
-    secteurHydro = st_transform(secteurHydro, 2154)
-    secteurHydro = st_simplify(secteurHydro,
-                               preserveTopology=TRUE,
-                               dTolerance=toleranceRel*0.6)
+    if (!is.null(secteurHydro_shp_path)) {
+        secteurHydro_path = file.path(computer_shp_path,
+                                      secteurHydro_shp_path)
+        secteurHydro = st_read(secteurHydro_path)
+        secteurHydro = st_transform(secteurHydro, 2154)
+        secteurHydro = st_simplify(secteurHydro,
+                                   preserveTopology=TRUE,
+                                   dTolerance=toleranceRel*0.6)
+    } else {
+        secteurHydro = NULL
+    }
     
     # Hydrological code bassin
-    entiteHydro_list = lapply(entiteHydro_path, read_sf)
-    entiteHydro_list = lapply(entiteHydro_list, st_transform, 2154)
-    entiteHydro = do.call(rbind, entiteHydro_list)
-    entiteHydro = entiteHydro[entiteHydro$Code %in% Code,]
-    entiteHydro = st_simplify(entiteHydro,
-                              preserveTopology=TRUE,
-                              dTolerance=toleranceRel*0.4)
-
-    # Piezo entity
-    entitePiezo = st_read(entitePiezo_path)
-    entitePiezo = st_transform(entitePiezo, 2154)
-    entitePiezo = st_simplify(entitePiezo,
-                              preserveTopology=TRUE,
-                              dTolerance=toleranceRel*0.6)
+    if (!is.null(entiteHydro_shp_path)) {
+        entiteHydro_path = file.path(computer_shp_path,
+                                     entiteHydro_shp_path)
+        entiteHydro_list = lapply(entiteHydro_path, read_sf)
+        entiteHydro_list = lapply(entiteHydro_list, st_transform, 2154)
+        entiteHydro = do.call(rbind, entiteHydro_list)
+        entiteHydro = entiteHydro[entiteHydro$Code %in% Code,]
+        entiteHydro = st_simplify(entiteHydro,
+                                  preserveTopology=TRUE,
+                                  dTolerance=toleranceRel*0.4)
+    } else {
+        entiteHydro = NULL
+    }
     
+    # Piezo entity
+    if (!is.null(entitePiezo_shp_path)) {
+        entitePiezo_path = file.path(computer_shp_path,
+                                     entitePiezo_shp_path)
+        entitePiezo = st_read(entitePiezo_path)
+        entitePiezo = st_transform(entitePiezo, 2154)
+        entitePiezo = st_simplify(entitePiezo,
+                                  preserveTopology=TRUE,
+                                  dTolerance=toleranceRel*0.6)
+    } else {
+        entitePiezo = NULL
+    }    
     
     # If the river shapefile needs to be load
-    if (return_river) {
+    if (!is.null(river_shp_path)) {
+        river_path = file.path(computer_shp_path,
+                               river_shp_path)
         # Hydrographic network
         river = st_read(river_path)
         river = st_transform(river, 2154)
@@ -393,11 +413,11 @@ split_path = function (path) {
 
 # X2px(unlist(strsplit(text, "")), PX)
 
-    # PX = get_alphabet_in_px(save=TRUE)
-    
-    # Span = lapply(strsplit(Model, "*"), X2px, PX=PX)
-    # Span = lapply(Span, sum)
-    # Span = unlist(Span)
+# PX = get_alphabet_in_px(save=TRUE)
+
+# Span = lapply(strsplit(Model, "*"), X2px, PX=PX)
+# Span = lapply(Span, sum)
+# Span = unlist(Span)
 
 
 plotly_save = function (fig, path) {
@@ -584,7 +604,7 @@ convert2TeX = function (Var, size=NULL, is_it_small=FALSE, replace_space=FALSE, 
             var = gsub("[}]", "}$", var)
         }
         # if (grepl("\\^[{][$][-]", var)) {
-            # var = gsub("\\^[{][$][-]", "^{-$", var)
+        # var = gsub("\\^[{][$][-]", "^{-$", var)
         # }
         if (grepl("\\^[[:alnum:]]", var)) {
             var = gsub("\\^", "$^$", var)
