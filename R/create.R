@@ -588,6 +588,7 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 #' @param verbose Boolean to indicate if more processing info are
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
+#' @importFrom rlang data_sym
 #' @export
 create_data_HYDRO = function (computer_data_path, filedir, filename,
                               val2keep=NULL,
