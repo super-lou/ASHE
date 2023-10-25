@@ -588,7 +588,6 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 #' @param verbose Boolean to indicate if more processing info are
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
-#' @importFrom rlang data_sym
 #' @export
 create_data_HYDRO = function (computer_data_path, filedir, filename,
                               val2keep=NULL,
@@ -686,7 +685,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
                                  Q=as.numeric(data$Qls)*1E-3,
-                                 !!data_sym(names(val2keep)),
+                                 !!rlang::data_sym(names(val2keep)),
                                  .keep="used")
 
             isNA = data[[names(val2keep)]] != val2keep | is.na(data$Q)
