@@ -685,7 +685,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
                                  Q=as.numeric(data$Qls)*1E-3,
-                                 !!!rlang::data_sym(names(val2keep)),
+                                 !!data_sym(names(val2keep)),
                                  .keep="used")
 
             isNA = data[[names(val2keep)]] != val2keep | is.na(data$Q)
