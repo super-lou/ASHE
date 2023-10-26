@@ -199,14 +199,14 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
 #' @export
 find_regimeHydro = function (dataEXserieQM,
                              lim_number=NULL,
-                             dataEXserieP_ratio=NULL,
+                             dataEXserieR_ratio=NULL,
                              threshold=0.09) {
     
-    if (!is.null(dataEXserieP_ratio)) {
+    if (!is.null(dataEXserieR_ratio)) {
         isMOD =
-            dplyr::mutate(dataEXserieP_ratio,
-                          isPluvial=Ps_ratio < threshold,
-                          isSnow=Ps_ratio >= threshold)
+            dplyr::mutate(dataEXserieR_ratio,
+                          isPluvial=Rs_ratio < threshold,
+                          isSnow=Rs_ratio >= threshold)
         isMOD$forceId = NA
         isMOD$forceIdIf = NA
         isMOD$forceId[isMOD$isPluvial] = list(1:6)
