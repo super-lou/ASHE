@@ -430,17 +430,27 @@ plotly_save = function (fig, path) {
 
 
 strsplit_unlist = function (...) {unlist(strsplit(...))}
-other_letters = c("é", "è", "à")
-numbers = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
-symbols = c("-", "_", ".", ",", "*", "'", "%", "(", ")", "[", "]", "{", "}", "!", "?", "+", "=", "@", "|", "#", "&")
+
+#' @title get_alphabet_in_px
+#' @export
 get_alphabet_in_px = function (alphabet=c(letters, LETTERS,
-                                          other_letters,
-                                          numbers, symbols),
+                                          c("é", "è", "à", "ç",
+                                            "É", "È", "À", "Ç"),
+                                          c("1", "2", "3", "4",
+                                            "5", "6", "7", "8",
+                                            "9", "0"),
+                                          c("-", "_", ".", ",",
+                                            "*", "'", "%", "(",
+                                            ")", "[", "]", "{",
+                                            "}", "!", "?", "+",
+                                            "=", "@", "|", "#",
+                                            "&")),
                                size=50, font="sans",
                                style="normal",
                                isNorm=TRUE,
                                out_dir="letter",
                                save=FALSE) {
+        
     library(magick)
     if (save &!dir.exists(out_dir)) {
         dir.create(out_dir)
@@ -496,7 +506,8 @@ get_alphabet_in_px = function (alphabet=c(letters, LETTERS,
     return (PX)
 }
 
-
+#' @title text2px
+#' @export
 text2px = function (text, PX) {
     text = unlist(strsplit(text, ""))
     px = PX[text]
@@ -505,6 +516,8 @@ text2px = function (text, PX) {
     return (px)
 }
 
+#' @title char2px
+#' @export
 char2px = function (char, PX) {
     px = PX[char]
     px[is.na(px)] = mean(px, na.rm=TRUE)
@@ -512,15 +525,17 @@ char2px = function (char, PX) {
 }
 
 
-select_good = function (X) {
-    Xrle = rle(X)
-    value = Xrle$values[Xrle$lengths == max(Xrle$lengths)]
-    if (length(value) > 1) {
-        value = mean(value, na.rm=TRUE)
-    }
-    return (value)
-}
+# select_good = function (X) {
+#     Xrle = rle(X)
+#     value = Xrle$values[Xrle$lengths == max(Xrle$lengths)]
+#     if (length(value) > 1) {
+#         value = mean(value, na.rm=TRUE)
+#     }
+#     return (value)
+# }
 
+#' @title guess_newline
+#' @export
 guess_newline = function (text, px=40, nChar=100,
                           PX=NULL, newlineId="\n") {
 
@@ -547,13 +562,6 @@ guess_newline = function (text, px=40, nChar=100,
             estimator)
         idNewline = which.min(abs(posSpace_distance - lim))
         posNewline = posSpace[idNewline] + begin
-
-        # print(posNewline)
-        # print(Newline)
-        # print(distance)
-        # print(begin)
-        # print("")
-        
         text = paste(substring(text,
                                c(1, posNewline + 1),
                                c(posNewline - 1,
@@ -573,7 +581,8 @@ guess_newline = function (text, px=40, nChar=100,
 }
 
 
-
+#' @title convert2TeX
+#' @export
 convert2TeX = function (Var, size=NULL, is_it_small=FALSE, replace_space=FALSE, bold=TRUE) {
     nVar = length(Var)
 

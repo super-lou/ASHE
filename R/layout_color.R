@@ -340,6 +340,35 @@ theme_WIP = function () {
 
 ## 2. COLOR MANAGEMENT _______________________________________________
 ### 2.1. Compute colors ______________________________________________
+
+get_nearest = function (x, X) {
+    X[which.min(abs(x - X))]
+}
+
+round_pimp = function (bin, center=NULL) {
+    step = round(diff(bin)[1], -get_power(diff(bin)[1]))
+    Step = step*0:round(10^(max(sapply(bin, get_power))+1)/step)
+    if (is.null(center)) {
+        center = 0
+    }
+    Step = c(center-rev(Step[-1]), center + Step)
+    Step = sapply(bin, get_nearest, Step)
+
+    i = 1
+    while (any(duplicated(Step))) {
+        step = round(diff(bin)[1], -get_power(diff(bin)[1])+1)
+        Step = step*0:round(10^(max(sapply(bin, get_power))+1)/step)
+        if (is.null(center)) {
+            center = 0
+        }
+        Step = c(center-rev(Step[-1]), center + Step)
+        Step = sapply(bin, get_nearest, Step)
+        i = i+1
+    }
+    return (Step)
+}
+
+
 #' @title Compute color bin
 #' @export
 compute_colorBin = function (min, max, colorStep, center=NULL,
@@ -363,7 +392,8 @@ compute_colorBin = function (min, max, colorStep, center=NULL,
     }
     
     bin = seq(minValue, maxValue, length.out=nBin)
-
+    bin = round_pimp(bin, center=center)
+    
     if (length(include) == 1) {
         if (!include) {
             upBin = c(bin, Inf)
@@ -379,7 +409,7 @@ compute_colorBin = function (min, max, colorStep, center=NULL,
             upBin = c(bin, Inf)
             lowBin = c(-Inf, bin)
             bin = c(-Inf, bin, Inf)
-            
+
         } else if (include[1] & !include[2]) {
             upBin = c(bin[2:length(bin)], Inf)
             lowBin = bin

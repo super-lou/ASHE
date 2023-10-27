@@ -7,7 +7,7 @@
 find_regimeHydro(
   dataEXserieQM,
   lim_number = NULL,
-  dataEXserieP_ratio = NULL,
+  dataEXserieR_ratio = NULL,
   threshold = 0.09
 )
 }

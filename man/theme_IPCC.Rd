@@ -6,7 +6,8 @@
 \usage{
 theme_IPCC(
   isBack = TRUE,
-  isGrid = TRUE,
+  isGridX = FALSE,
+  isGridY = TRUE,
   isTitle = FALSE,
   dTitle = 0,
   isLabelX = FALSE,
