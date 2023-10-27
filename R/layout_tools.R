@@ -77,6 +77,8 @@ gg_circle = function(r, xc, yc, color="black", fill=NA, ...) {
              fill=fill, ...)
 }
 
+#' @title nbsp
+#' @export
 nbsp = function (n, size=NA) {
     if (is.na(size)) {
         paste0(rep("<span> </span>", times=n), collapse="")
@@ -192,16 +194,22 @@ round_label = function (labelRaw, direction="V", ncharLim=4) {
     return (label)
 }
 
+#' @title is.wholenumber
+#' @export
 is.wholenumber = function (X, tol=.Machine$double.eps^0.5) {
     res = abs(X - round(X)) < tol
     return (res)
 }
 
+#' @title chr2op
+#' @export
 chr2op = function (x) {
     res = eval(parse(text=x))
     return (res)
 }
 
+#' @title float2frac
+#' @export
 float2frac = function (X, den) {
     Frac = paste0(round(X * den), "/", den)
     evalFrac = sapply(X, chr2op)
@@ -381,6 +389,8 @@ load_logo = function (resources_path, logo_dir, logo_to_show) {
 }
 
 ### 4.3. Font loading ________________________________________________
+#' @title load_font
+#' @export
 load_font = function (path=NULL, force_import=FALSE) {
 
     extrafont::font_import(paths=path)
@@ -419,7 +429,8 @@ split_path = function (path) {
 # Span = lapply(Span, sum)
 # Span = unlist(Span)
 
-
+#' @title plotly_save
+#' @export
 plotly_save = function (fig, path) {
     htmlwidgets::saveWidget(fig,
                             file=path,
@@ -428,7 +439,8 @@ plotly_save = function (fig, path) {
     unlink(file.path(dirname(path), libdir), recursive=TRUE)
 }
 
-
+#' @title strsplit_unlist
+#' @export
 strsplit_unlist = function (...) {unlist(strsplit(...))}
 
 #' @title get_alphabet_in_px
@@ -512,7 +524,7 @@ text2px = function (text, PX) {
     text = unlist(strsplit(text, ""))
     px = PX[text]
     px[is.na(px)] = mean(px, na.rm=TRUE)
-    px = sum(px)
+    px = sum(px, na.rm=TRUE)
     return (px)
 }
 
@@ -551,15 +563,17 @@ guess_newline = function (text, px=40, nChar=100,
             text2px(text, PX=PX)
         }
     }
+
+    text = paste0(text, " ")
+
     Newline = text
     distance = estimator(Newline)
     begin = 0
     
     while (distance > lim & sum(grepl(" ", text)) > 0) {        
         posSpace = which(strsplit(Newline, "")[[1]] == " ")
-        posSpace_distance = sapply(lapply(
-            posSpace, substr, x=Newline, start=1),
-            estimator)
+        posSpace_distance = lapply(posSpace, substr, x=Newline, start=1)
+        posSpace_distance = sapply(posSpace_distance, estimator)
         idNewline = which.min(abs(posSpace_distance - lim))
         posNewline = posSpace[idNewline] + begin
         text = paste(substring(text,
@@ -574,7 +588,7 @@ guess_newline = function (text, px=40, nChar=100,
                          posNewline + 1,
                          nchar(text))
         distance = estimator(Newline)
-        begin = nchar(text) - nchar(Newline) + begin
+        begin = nchar(text) - nchar(Newline)
     }
     
     return (text)
