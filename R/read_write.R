@@ -52,12 +52,12 @@ write_tibble = function (tbl, filedir="./", filename="data.txt") {
     name = gsub("[.].*$", "", filename)
     format = gsub("^.*[.]", "", filename)
     filepath = file.path(filedir, filename)
-    
+
     if (any(class(tbl) == "list")) {
         N = length(tbl)
         for (i in 1:N) {
             write_tibble(tbl[[i]],
-                         filedir=file.path(filedir, name, format) ,
+                         filedir=file.path(filedir, name) ,
                          filename=paste0(names(tbl)[i],
                                          ".",
                                          format))
@@ -216,8 +216,7 @@ read_tibble = function (filepath=NULL,
     filepath_name = gsub("[.].*$", "", basename(filepath))
     filepath_format = gsub("^.*[.]", "", basename(filepath))
     filepath_dir = file.path(dirname(filepath),
-                             filepath_name,
-                             filepath_format)
+                             filepath_name)
 
     if (dir.exists(filepath_dir)) {
         Filepath = list.files(filepath_dir,
