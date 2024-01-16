@@ -38,10 +38,10 @@ join_selection = function (list_data, list_meta, list_from) {
         
         if (!is.null(datatmp)) {
             
-            datatmp = datatmp[!(datatmp$Code %in% Code),]
-            df_metatmp = df_metatmp[!(df_metatmp$Code %in% Code),]
+            datatmp = datatmp[!(datatmp$code %in% Code),]
+            df_metatmp = df_metatmp[!(df_metatmp$code %in% Code),]
             Code = c(Code,
-                     df_metatmp$Code[!(df_metatmp$Code %in% Code)])
+                     df_metatmp$code[!(df_metatmp$code %in% Code)])
             
             df_metatmp$source = from
             
@@ -77,7 +77,7 @@ add_mod = function (df_mod, Code, type, fun_name, comment, df_meta=NULL) {
     }
     
     for (code in Code) {
-        df_modtmp = tibble(Code=code, type=type,
+        df_modtmp = tibble(code=code, type=type,
                            fun_name=fun_name,
                            comment=comment)
         df_mod = bind_rows(df_mod, df_modtmp)
@@ -94,14 +94,14 @@ add_critique = function (df_critique, Code, author, level, start_date, variable,
         Code = NA # erreur
     } else if (Code == 'all' & !is.null(df_meta)) {
         # Get all different stations code
-        Code = rle(data$Code)$value
+        Code = rle(data$code)$value
     }
 
     if (is.null(end_date)) {
         end_date = start_date
     }
     
-    df_tmp = tibble(Code=Code, author=author, level=level,
+    df_tmp = tibble(code=Code, author=author, level=level,
                     start_date=start_date, end_date=end_date,
                     variable=variable, type=type,
                     comment=comment)

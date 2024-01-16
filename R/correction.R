@@ -34,18 +34,18 @@ flag_data = function (data, flag, mod=NULL,
         print('Checking of flags')
     }
 
-    Code = rle(data$Code)$value
+    Code = rle(data$code)$value
 
     for (code in Code) {
-        if (code %in% flag$Code) {
+        if (code %in% flag$code) {
 
-            flag_code = flag[flag$Code == code,]
+            flag_code = flag[flag$code == code,]
             nbFlag = nrow(flag_code)
 
             for (i in 1:nbFlag) {
                 newQ = flag_code$newQ[i]
                 flagDate = as.Date(flag_code$Date[i])
-                OKcor = data$Code == code & data$Date == flagDate
+                OKcor = data$code == code & data$Date == flagDate
                 oldQ = data$Q[OKcor]
                 data$Q[OKcor] = newQ
 

@@ -497,10 +497,10 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
         meta =
             dplyr::tibble(
                 # Station code
-                Code=trimws(substr(metatxt[11], 38,
+                code=trimws(substr(metatxt[11], 38,
                                    nchar(metatxt[11]))),
                 # Station name
-                Nom=trimws(substr(metatxt[12], 39,
+                name=trimws(substr(metatxt[12], 39,
                                   nchar(metatxt[12]))),
                 # Territory
                 Territoire=trimws(substr(metatxt[13], 39,
@@ -548,8 +548,8 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
         Ltmp = substr(Ltmp, 1, 1)
         infoSecteur = rle(sort(Ltmp))$values
         
-        oneL = substr(meta$Code, 1, 1)
-        twoL = substr(meta$Code, 1, 2)
+        oneL = substr(meta$code, 1, 1)
+        twoL = substr(meta$code, 1, 2)
         RH = c()
         for (i in 1:length(oneL)) {
             if (oneL[i] %in% infoSecteur) {
@@ -669,7 +669,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
         meta = create_meta_HYDRO(computer_data_path, filedir, filename,
                                verbose=FALSE)
         # Get the code of the station
-        code = meta$Code
+        code = meta$code
         # Create a tibble with the date as Date class and the code
         # of the station
         data = dplyr::tibble(data)
@@ -681,7 +681,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
 
         if (!is.null(val2keep)) {
             data = dplyr::mutate(data,
-                                 Code=code,
+                                 code=code,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
                                  Q=as.numeric(data$Qls)*1E-3,
@@ -697,7 +697,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             data = dplyr::select(data, -names(val2keep))
         } else {
             data = dplyr::mutate(data,
-                                 Code=code,
+                                 code=code,
                                  Date=as.Date(as.character(data$Date),
                                               format="%Y%m%d"),
                                  Q=as.numeric(data$Qls)*1E-3,
@@ -742,7 +742,7 @@ create_climate_data = function (computer_data_path, filedir,
     
     basin = gsub("[^[:alnum:] ].*$", '', filelist)
     
-    meta = tibble(Code=basin)
+    meta = tibble(code=basin)
     data = tibble()
     nfile = length(filelist)
     
@@ -754,11 +754,11 @@ create_climate_data = function (computer_data_path, filedir,
                                 sep=' ',
                                 skip=1)
 
-        data_basin$Code = basin[i]
+        data_basin$code = basin[i]
 
         data = bind_rows(data, data_basin)
     }
-    colnames(data) = c(colNames, 'Code')
+    colnames(data) = c(colNames, 'code')
     data$Date = as.Date(data$Date) 
     res = list(data=data, meta=meta)
     return (res)

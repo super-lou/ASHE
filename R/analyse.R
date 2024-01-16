@@ -214,13 +214,13 @@ find_regimeHydro = function (dataEXserieQM,
         # isMOD$forceIdIf[isMOD$isSnow] = list(1:3)
         dataEXserieQM = dplyr::full_join(dataEXserieQM,
                                          dplyr::select(isMOD,
-                                                       c("Code",
+                                                       c("code",
                                                          "forceId",
                                                          "forceIdIf")),
-                                         by="Code")
+                                         by="code")
         regimeHydro =
             dplyr::summarise(dplyr::group_by(dataEXserieQM,
-                                             Code),
+                                             code),
                              as_tibble(
                                  hide_find_regimeHydro(QM,
                                                        forceId[[1]],
@@ -230,7 +230,7 @@ find_regimeHydro = function (dataEXserieQM,
     } else {
         regimeHydro =
             dplyr::summarise(dplyr::group_by(dataEXserieQM,
-                                             Code),
+                                             code),
                              as_tibble(
                                  hide_find_regimeHydro(QM)),
                              .groups="drop")
@@ -273,7 +273,7 @@ find_regimeHydro = function (dataEXserieQM,
 get_break = function (data, meta, level=0.1) {
     
     # Get all different stations code
-    Code = rle(data$Code)$value
+    Code = rle(data$code)$value
     # Number of stations
     nCode = length(Code)
 
@@ -285,7 +285,7 @@ get_break = function (data, meta, level=0.1) {
     # For all accessible code
     for (code in Code) {
         # Get the associated data
-        data_code = data[data$Code == code,] 
+        data_code = data[data$code == code,] 
         # Remove NA data
         data_codeNoNA = data_code[!is.na(data_code$Q),]
 
@@ -311,7 +311,7 @@ get_break = function (data, meta, level=0.1) {
         # step2 = mean(data_codeNoNA$Q[(ibreak+1):nbreak])
     }
     # Create a tibble with the break analysis results
-    break = tibble(Code=Code_break, Date=as.Date(Date_break),
+    break = tibble(code=Code_break, Date=as.Date(Date_break),
                    significant=Signif_break)
     return (break)
 }
@@ -324,7 +324,7 @@ get_break = function (data, meta, level=0.1) {
 get_lacune = function (data, meta) {
     
     # Get all different stations code
-    Code = levels(factor(data$Code))
+    Code = levels(factor(data$code))
     
     # Create new vector to stock results for cumulative and mean
     # time gap by station
@@ -339,7 +339,7 @@ get_lacune = function (data, meta) {
     # For every station
     for (code in Code) {   
         # Get only the data rows for the selected station
-        data_code = data[data$Code==code,]
+        data_code = data[data$code==code,]
         data_code = dplyr::filter(data_code, !duplicated(Date))
         # Get date for the selected station
         Date = data_code$Date
@@ -347,7 +347,7 @@ get_lacune = function (data, meta) {
         span = as.numeric(Date[length(Date)] - Date[1])
         
         # Get only the data rows with no NA for the selected station
-        data_NoNA_code = data_NoNA[data_NoNA$Code==code,]
+        data_NoNA_code = data_NoNA[data_NoNA$code==code,]
         # Get date for the selected station
         Date_NoNA = data_NoNA_code$Date
         
@@ -368,8 +368,8 @@ get_lacune = function (data, meta) {
     # Compute the cumulative gap rate in pourcent
     tLac_pct = tLac * 100
     # Create tibble for lacune
-    lac = tibble(Code=Code, tLac_pct=tLac_pct, meanLac=meanLac)
+    lac = tibble(code=Code, tLac_pct=tLac_pct, meanLac=meanLac)
     # Join a tibble
-    meta = dplyr::left_join(meta, lac, by="Code")
+    meta = dplyr::left_join(meta, lac, by="code")
     return (meta)
 }
