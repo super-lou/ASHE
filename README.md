@@ -5,11 +5,11 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md) 
 <!-- badges: end -->
 
-**ASHE** is a messy package that gathers various useful tools (at least for me) for hydrological and environmental statistical analysis in R.
-
-This project was carried out for National Research Institute for Agriculture, Food and the Environment (Institut National de Recherche pour l’Agriculture, l’Alimentation et l’Environnement, [INRAE](https://agriculture.gouv.fr/inrae-linstitut-national-de-recherche-pour-lagriculture-lalimentation-et-lenvironnement) in french).
+**ASHE** is a messy package that gathers various useful tools (at least for me) for reading, analyzing, and writing hydrological and environmental data in R.
 
 **ASHE** stand for Analysis and Statistics for Hydrology and Environment.
+
+This project was carried out for National Research Institute for Agriculture, Food and the Environment (Institut National de Recherche pour l’Agriculture, l’Alimentation et l’Environnement, [INRAE](https://agriculture.gouv.fr/inrae-linstitut-national-de-recherche-pour-lagriculture-lalimentation-et-lenvironnement) in french).
 
 
 ## Installation
