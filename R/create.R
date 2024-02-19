@@ -680,25 +680,22 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             }
         }
 
-        data = dplyr::mutate(data,
-                             code=code,
-                             date=as.Date(as.character(data$Date),
-                                          format="%Y%m%d"),
-                             Qls, Qmmj,
-                             Qm3s=Qls*1E-3,
-                             !!names(val_to_keep):=
-                                 get(names(val_to_keep)),
-                             .keep="used")
-        data = dplyr::select(data, dplyr::all_of(c("date",
-                                                   "code",
-                                                   variable_to_load,
-                                                   names(val_to_keep))))
-
-        if (length(variable_to_load) == 1) {
-            data = dplyr::rename(data, Q=dplyr::all_of(variable_to_load))
-        }
-
         if (!is.null(val_to_keep)) {
+            data = dplyr::mutate(data,
+                                 code=code,
+                                 date=as.Date(as.character(data$Date),
+                                              format="%Y%m%d"),
+                                 Qls=as.numeric(Qls),
+                                 Qmmj=as.numeric(Qmmj),
+                                 Qm3s=as.numeric(Qls)*1E-3,
+                                 !!names(val_to_keep):=
+                                     get(names(val_to_keep)),
+                                 .keep="used")
+            data = dplyr::select(data, dplyr::all_of(c("date",
+                                                       "code",
+                                                       variable_to_load,
+                                                       names(val_to_keep))))
+            
             isNA = data[[names(val_to_keep)]] != val_to_keep | is.na(data$Q)
             isNArle = rle(isNA)
             isNArle = isNArle$lengths*isNArle$values
@@ -706,8 +703,25 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             data = data[(isNArle[1]+1):(N-isNArle[length(isNArle)]),]
             data$Q[data[[names(val_to_keep)]] != val_to_keep] = NA
             data = dplyr::select(data, -names(val_to_keep))
-        }
             
+        } else {
+            data = dplyr::mutate(data,
+                                 code=code,
+                                 date=as.Date(as.character(data$Date),
+                                              format="%Y%m%d"),
+                                 Qls=as.numeric(Qls),
+                                 Qmmj=as.numeric(Qmmj),
+                                 Qm3s=as.numeric(Qls)*1E-3,
+                                 .keep="used")
+            data = dplyr::select(data, dplyr::all_of(c("date",
+                                                       "code",
+                                                       variable_to_load)))
+        }
+
+        if (length(variable_to_load) == 1) {
+            data = dplyr::rename(data, Q=dplyr::all_of(variable_to_load))
+        }
+        
         return (data)
 
     } else {
