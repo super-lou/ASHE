@@ -590,7 +590,8 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 #' @return A tibble containing data about selected stations.
 #' @export
 create_data_HYDRO = function (computer_data_path, filedir, filename,
-                              val2keep=NULL,
+                              variable_to_load=c("Qm3s", "Qls", "Qmmj"),
+                              val_to_keep=NULL,
                               verbose=TRUE) {
     
     # Convert the filename in vector
@@ -637,7 +638,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                          create_data_HYDRO(computer_data_path=computer_data_path, 
                                       filedir=filedir, 
                                       filename=f,
-                                      val2keep=val2keep,
+                                      val_to_keep=val_to_keep,
                                       verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
@@ -679,30 +680,34 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             }
         }
 
-        if (!is.null(val2keep)) {
-            data = dplyr::mutate(data,
-                                 code=code,
-                                 Date=as.Date(as.character(data$Date),
-                                              format="%Y%m%d"),
-                                 Q=as.numeric(data$Qls)*1E-3,
-                                 !!rlang::data_sym(names(val2keep)),
-                                 .keep="used")
+        data = dplyr::mutate(data,
+                             code=code,
+                             date=as.Date(as.character(data$Date),
+                                          format="%Y%m%d"),
+                             Qls, Qmmj,
+                             Qm3s=Qls*1E-3,
+                             !!names(val_to_keep):=
+                                 get(names(val_to_keep)),
+                             .keep="used")
+        data = dplyr::select(data, dplyr::all_of(c("date",
+                                                   "code",
+                                                   variable_to_load,
+                                                   names(val_to_keep))))
 
-            isNA = data[[names(val2keep)]] != val2keep | is.na(data$Q)
+        if (length(variable_to_load) == 1) {
+            data = dplyr::rename(data, Q=dplyr::all_of(variable_to_load))
+        }
+
+        if (!is.null(val_to_keep)) {
+            isNA = data[[names(val_to_keep)]] != val_to_keep | is.na(data$Q)
             isNArle = rle(isNA)
             isNArle = isNArle$lengths*isNArle$values
             N = nrow(data)
             data = data[(isNArle[1]+1):(N-isNArle[length(isNArle)]),]
-            data$Q[data[[names(val2keep)]] != val2keep] = NA
-            data = dplyr::select(data, -names(val2keep))
-        } else {
-            data = dplyr::mutate(data,
-                                 code=code,
-                                 Date=as.Date(as.character(data$Date),
-                                              format="%Y%m%d"),
-                                 Q=as.numeric(data$Qls)*1E-3,
-                                 .keep="used")
+            data$Q[data[[names(val_to_keep)]] != val_to_keep] = NA
+            data = dplyr::select(data, -names(val_to_keep))
         }
+            
         return (data)
 
     } else {
