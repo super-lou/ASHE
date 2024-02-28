@@ -422,7 +422,7 @@ convert_regexp = function (computer_data_path, filedir,
 #' @return A tibble containing metadata about selected stations.
 #' @export
 create_meta_HYDRO = function (computer_data_path, filedir, filename,
-                         verbose=TRUE) {
+                              verbose=TRUE) {
     
     # Convert the filename in vector
     filename = c(filename)
@@ -636,10 +636,11 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
             # when filename correspond to only one filename
             data = rbind(data,
                          create_data_HYDRO(computer_data_path=computer_data_path, 
-                                      filedir=filedir, 
-                                      filename=f,
-                                      val_to_keep=val_to_keep,
-                                      verbose=FALSE))
+                                           filedir=filedir, 
+                                           filename=f,
+                                           variable_to_load=variable_to_load,
+                                           val_to_keep=val_to_keep,
+                                           verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
         rownames(data) = NULL
@@ -721,7 +722,6 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
         if (length(variable_to_load) == 1) {
             data = dplyr::rename(data, Q=dplyr::all_of(variable_to_load))
         }
-        
         return (data)
 
     } else {
