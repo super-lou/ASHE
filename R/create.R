@@ -677,10 +677,18 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                           skip=skip)
 
         # Create all the metadata for the station
-        meta = create_meta_HYDRO(computer_data_path, filedir, filename,
-                               verbose=FALSE)
+        # meta = create_meta_HYDRO(computer_data_path, filedir, filename,
+                               # verbose=FALSE)
         # Get the code of the station
-        code = meta$code
+        # code = meta$code
+
+        metatxt = c(readLines(file_path, n=skip, encoding="UTF-8"))
+        if (format == "HYDRO2") {
+            code = trimws(substr(metatxt[11], 38, nchar(metatxt[11])))
+        } else if (format == "HYDRO3") {
+            code = trimws(substr(metatxt[20], 38, nchar(metatxt[20])))
+        }
+
         # Create a tibble with the date as Date class and the code
         # of the station
         data = dplyr::tibble(data)
