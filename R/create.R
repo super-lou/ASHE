@@ -647,6 +647,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                                            filename=f,
                                            variable_to_load=variable_to_load,
                                            val_to_keep=val_to_keep,
+                                           format=format,
                                            verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
