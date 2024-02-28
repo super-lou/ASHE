@@ -28,6 +28,7 @@
 # shapefiles loading.
 
 
+
 ### 1. GENERAL METADATA ON STATION ___________________________________
 # Status of the station
 #' @title Status info
