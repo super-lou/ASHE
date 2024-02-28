@@ -592,10 +592,17 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 create_data_HYDRO = function (computer_data_path, filedir, filename,
                               variable_to_load=c("Qm3s", "Qls", "Qmmj"),
                               val_to_keep=NULL,
+                              format="HYDRO2",
                               verbose=TRUE) {
     
     # Convert the filename in vector
     filename = c(filename)
+
+    if (format == "HYDRO2") {
+        skip = 41
+    } else if (format == "HYDRO3") {
+        skip = 55
+    }
 
     # Print metadata if asked
     if (verbose) {
@@ -665,7 +672,7 @@ create_data_HYDRO = function (computer_data_path, filedir, filename,
                           header=TRUE,
                           na.strings=c('     -99', ' -99.000'),
                           sep=';',
-                          skip=41)
+                          skip=skip)
 
         # Create all the metadata for the station
         meta = create_meta_HYDRO(computer_data_path, filedir, filename,
