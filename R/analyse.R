@@ -231,8 +231,7 @@ find_regimeHydro = function (dataEXserieQM,
         regimeHydro =
             dplyr::summarise(dplyr::group_by(dataEXserieQM,
                                              code),
-                             as_tibble(
-                                 hide_find_regimeHydro(QM)),
+                             as_tibble(hide_find_regimeHydro(QM)),
                              .groups="drop")
     }
 
@@ -340,16 +339,16 @@ get_lacune = function (data, meta) {
     for (code in Code) {   
         # Get only the data rows for the selected station
         data_code = data[data$code==code,]
-        data_code = dplyr::filter(data_code, !duplicated(Date))
+        data_code = dplyr::filter(data_code, !duplicated(date))
         # Get date for the selected station
-        Date = data_code$Date
+        Date = data_code$date
         # Get time span for the selection station
         span = as.numeric(Date[length(Date)] - Date[1])
         
         # Get only the data rows with no NA for the selected station
         data_NoNA_code = data_NoNA[data_NoNA$code==code,]
         # Get date for the selected station
-        Date_NoNA = data_NoNA_code$Date
+        Date_NoNA = data_NoNA_code$date
         
         # Compute the time gap
         lac = as.numeric(diff(Date_NoNA) - 1)

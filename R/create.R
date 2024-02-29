@@ -133,16 +133,16 @@ iRegHydro = function () {
       'M'='Loire',
       'N'='Fleuves côtiers au sud de la Loire',
       'O'='Garonne',
-      # 'O0'='Garonne',
-      # 'O1'='Garonne',
-      # 'O2'='Garonne',
-      # 'O3'='Tarn-Aveyron',
-      # 'O4'='Tarn-Aveyron',
-      # 'O5'='Tarn-Aveyron',
-      # 'O6'='Tarn-Aveyron',
-      # 'O7'='Lot',
-      # 'O8'='Lot',
-      # 'O9'='Lot',
+      'O0'='Garonne',
+      'O1'='Garonne',
+      'O2'='Garonne',
+      'O3'='Tarn-Aveyron',
+      'O4'='Tarn-Aveyron',
+      'O5'='Tarn-Aveyron',
+      'O6'='Tarn-Aveyron',
+      'O7'='Lot',
+      'O8'='Lot',
+      'O9'='Lot',
       'P'='Dordogne',
       'Q'='Adour',
       'R'='Charente',
@@ -423,6 +423,7 @@ convert_regexp = function (computer_data_path, filedir,
 #' @return A tibble containing metadata about selected stations.
 #' @export
 create_meta_HYDRO = function (computer_data_path, filedir, filename,
+                              hydrological_region_level=1,
                               verbose=TRUE) {
     
     # Convert the filename in vector
@@ -504,10 +505,10 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
                 name=trimws(substr(metatxt[12], 39,
                                   nchar(metatxt[12]))),
                 # Territory
-                Territoire=trimws(substr(metatxt[13], 39,
+                territoire=trimws(substr(metatxt[13], 39,
                                          nchar(metatxt[13]))),
                 # Administrator
-                Gestionnaire=trimws(substr(metatxt[7], 60,
+                gestionnaire=trimws(substr(metatxt[7], 60,
                                            nchar(metatxt[7]))),
                 # Lambert 93 localisation
                 # L93X_m_IN=as.numeric(substr(metatxt[16], 65, 77)),
@@ -517,11 +518,11 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 
                 # Surface
                 # surface_km2_IN=as.numeric(substr(metatxt[19], 52, 63)),
-                Surface_km2=as.numeric(substr(metatxt[19], 38, 50)),
+                surface_km2=as.numeric(substr(metatxt[19], 38, 50)),
 
                 # Elevation
                 # altitude_m_IN=as.numeric(substr(metatxt[20], 52, 63)),
-                Altitude_m=as.numeric(substr(metatxt[20], 38, 50)),
+                altitude_m=as.numeric(substr(metatxt[20], 38, 50)),
 
                 # Start and end of the data
                 debut=substr(metatxt[25], 38, 50),
@@ -540,9 +541,9 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
                 # The path to the data file of BH
                 file_path=file_path)
         
-        meta$Surface_km2[(meta$Surface_km2) <= 0] = NA
+        meta$surface_km2[(meta$surface_km2) <= 0] = NA
         # meta$surface_km2_IN[(meta$surface_km2_BH) <= 0] = NA
-        meta$Altitude_m[(meta$Altitude_m) < 0] = NA
+        meta$altitude_m[(meta$altitude_m) < 0] = NA
         # meta$altitude_m_IN[(meta$altitude_m_BH) < 0] = NA
 
         Ltmp = names(iRegHydro())[nchar(names(iRegHydro())) == 2]
@@ -553,7 +554,7 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
         twoL = substr(meta$code, 1, 2)
         RH = c()
         for (i in 1:length(oneL)) {
-            if (oneL[i] %in% infoSecteur) {
+            if (oneL[i] %in% infoSecteur & hydrological_region_level == 2) {
                 RHtmp = iRegHydro()[twoL[i]]
             } else {
                 RHtmp = iRegHydro()[oneL[i]]
@@ -562,7 +563,7 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
         }
         
         # Adding of the hydrological region
-        meta$Region_Hydro = RH
+        meta$hydrological_region = RH
         return (meta)
 
     } else {
