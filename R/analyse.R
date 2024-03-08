@@ -336,7 +336,7 @@ get_lacune = function (data, meta) {
     data_NoNA = data[NoNA,]
 
     # For every station
-    for (code in Code) {   
+    for (code in Code) {
         # Get only the data rows for the selected station
         data_code = data[data$code==code,]
         data_code = dplyr::filter(data_code, !duplicated(date))
