@@ -104,6 +104,10 @@ hide_find_regimeHydro = function (QM_code, forceId=NA, forceIdIf=NA,
         distance[j] = sum((QM_code / mean(QM_code, na.rm=TRUE) - xref[j, ])^2)
     }
 
+    if (!any(is.finite(distance))) {
+        return (NA)
+    }
+    
     id_tmp = which.min(distance)
     if (all(!is.na(forceId))) {
         if (all(!is.na(forceIdIf))) {
