@@ -43,7 +43,7 @@
 #' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
 #' @md
 #' @export
-write_tibble = function (tbl, filedir="./", filename="data.txt", quote=FALSE) {
+write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE) {
 
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
