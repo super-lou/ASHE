@@ -4,7 +4,13 @@
 \alias{create_meta_HYDRO}
 \title{Create metadata}
 \usage{
-create_meta_HYDRO(computer_data_path, filedir, filename, verbose = TRUE)
+create_meta_HYDRO(
+  computer_data_path,
+  filedir,
+  filename,
+  hydrological_region_level = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{computer_data_path}{Path to the data.}

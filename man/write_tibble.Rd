@@ -4,7 +4,7 @@
 \alias{write_tibble}
 \title{write_tibble}
 \usage{
-write_tibble(tbl, filedir = "./", filename = "data.txt")
+write_tibble(tbl, filedir = "./", filename = "data.txt", quote = TRUE)
 }
 \arguments{
 \item{tbl}{\code{\link[dplyr:reexports]{dplyr::tibble()}} to write.}

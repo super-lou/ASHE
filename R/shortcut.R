@@ -96,6 +96,8 @@ get_Nspace = function (data_code, unit, lim_pct, NspaceMax=NULL) {
 }
 
 
+#' @title post
+#' @export
 post = function(x, ...) {
     if (verbose) {
         if (MPI != "") {
