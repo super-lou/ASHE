@@ -236,7 +236,7 @@ read_tibble = function (filepath=NULL,
         if (format == "fst") {
             tbl = dplyr::tibble(fst::read_fst(filepath))
 
-        } else if (format == "fst") {
+        } else if (format == "rds") {
             tbl = readRDS(filepath)
 
         } else if (format == "Rdata") {
