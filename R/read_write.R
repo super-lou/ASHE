@@ -73,7 +73,7 @@ write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE) {
         } else if (format %in% c("csv", "txt")) {
             write.table(tbl,
                         file=filepath,
-                        sep=";",
+                        sep=",",
                         quote=quote,
                         row.names=FALSE)
         }
@@ -248,7 +248,7 @@ read_tibble = function (filepath=NULL,
         } else if (format %in% c("csv", "txt")) {
             tbl = dplyr::as_tibble(read.table(file=filepath,
                                               header=TRUE,
-                                              sep=";",
+                                              sep=",",
                                               quote='"',
                                               ...))
             for (j in 1:ncol(tbl)) {
