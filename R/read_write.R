@@ -43,7 +43,7 @@
 #' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
 #' @md
 #' @export
-write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE) {
+write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE, sep=",") {
 
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
@@ -73,7 +73,7 @@ write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE) {
         } else if (format %in% c("csv", "txt")) {
             write.table(tbl,
                         file=filepath,
-                        sep=",",
+                        sep=sep,
                         quote=quote,
                         row.names=FALSE)
         }
@@ -205,7 +205,7 @@ write_dataFST = function (data, resdir, filedir='fst',
 #' @md
 #' @export
 read_tibble = function (filepath=NULL,
-                        filedir="./", filename="data.txt", ...) {
+                        filedir="./", filename="data.txt", sep=",", ...) {
     
     if (is.null(filepath) & !is.null(filedir) & !is.null(filename)) {
         filepath = file.path(filedir, filename)
@@ -248,7 +248,7 @@ read_tibble = function (filepath=NULL,
         } else if (format %in% c("csv", "txt")) {
             tbl = dplyr::as_tibble(read.table(file=filepath,
                                               header=TRUE,
-                                              sep=",",
+                                              sep=sep,
                                               quote='"',
                                               ...))
             for (j in 1:ncol(tbl)) {
