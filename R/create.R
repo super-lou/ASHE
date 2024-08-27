@@ -591,7 +591,9 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
 #' @export
-create_data_HYDRO = function (computer_data_path, filedir, filename,
+create_data_HYDRO = function (computer_data_path,
+                              filedir="",
+                              filename="all",
                               variable_to_load=c("Qm3s", "Qls", "Qmmj"),
                               val_to_keep=NULL,
                               format="HYDRO2",
