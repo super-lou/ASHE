@@ -59,10 +59,9 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
         N = length(tbl)
         for (i in 1:N) {
             write_tibble(tbl[[i]],
-                         filedir=file.path(filedir, name) ,
-                         filename=paste0(names(tbl)[i],
-                                         ".",
-                                         format))
+                         path=file.path(filedir, name,
+                                        paste0(names(tbl)[i],
+                                               ".", format)))
         }
 
     } else {
@@ -214,7 +213,7 @@ read_tibble = function (path="data.csv", sep=",", ...) {
                            full.names=TRUE)
         Tbl = list()
         for (f in Paths) {
-            tbl = read_tibble(Paths=f)
+            tbl = read_tibble(path=f)
             Tbl = append(Tbl, list(tbl))
             names(Tbl)[length(Tbl)] = gsub("[.].*$", "",
                                            basename(f))
