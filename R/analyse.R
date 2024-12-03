@@ -273,7 +273,7 @@ find_regimeHydro = function (dataEXserieQM,
 # Compute the break date of the flow data by station 
 #' @title Break
 #' @export
-get_break = function (data, meta, level=0.1) {
+get_breaks = function (data, meta, level=0.1) {
     
     # Get all different stations code
     Code = rle(data$code)$value
@@ -314,9 +314,9 @@ get_break = function (data, meta, level=0.1) {
         # step2 = mean(data_codeNoNA$Q[(ibreak+1):nbreak])
     }
     # Create a tibble with the break analysis results
-    break = tibble(code=Code_break, Date=as.Date(Date_break),
+    breaks = tibble(code=Code_break, Date=as.Date(Date_break),
                    significant=Signif_break)
-    return (break)
+    return (breaks)
 }
 
 
