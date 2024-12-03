@@ -6,8 +6,8 @@
 \usage{
 create_data_HYDRO(
   computer_data_path,
-  filedir,
-  filename,
+  filedir = "",
+  filename = "all",
   variable_to_load = c("Qm3s", "Qls", "Qmmj"),
   val_to_keep = NULL,
   format = "HYDRO2",

@@ -4,14 +4,12 @@
 \alias{write_tibble}
 \title{write_tibble}
 \usage{
-write_tibble(tbl, filedir = "./", filename = "data.txt", quote = TRUE)
+write_tibble(tbl, path = "data.csv", quote = TRUE, sep = ",")
 }
 \arguments{
 \item{tbl}{\code{\link[dplyr:reexports]{dplyr::tibble()}} to write.}
 
-\item{filedir}{\emph{tibble, default="./"}   Directory to write the file.}
-
-\item{filename}{\emph{character, default="data.txt"}   Name of the file to write.}
+\item{path}{\emph{tibble, default="data.csv"} Path were the file will be writted.}
 }
 \description{
 Writes a \code{\link[dplyr:reexports]{dplyr::tibble()}} or a list of \code{\link[dplyr:reexports]{dplyr::tibble()}}.
@@ -27,10 +25,10 @@ iris = dplyr::tibble(iris)
 iris$Species = as.character(iris$Species)
 
 # writes a tibble
-write_tibble(iris, filedir="./", filename="iris.txt")
+write_tibble(iris, path="iris.csv")
 # or a list of tibble
 iris_setosa = iris[iris$Species == "setosa",]
 iris_virginica = iris[iris$Species == "virginica",]
 iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
-write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+write_tibble(iris_selection, path="iris_selection.csv")
 }

@@ -4,14 +4,10 @@
 \alias{read_tibble}
 \title{read_tibble}
 \usage{
-read_tibble(filepath = NULL, filedir = "./", filename = "data.txt", ...)
+read_tibble(path = "data.csv", sep = ",", ...)
 }
 \arguments{
-\item{filepath}{\emph{character, default=NULL}   Path to the file to read.}
-
-\item{filedir}{\emph{character, default="./"}   Directory to the file to read.}
-
-\item{filename}{\emph{character, default="data.txt"}   Name of the file to read.}
+\item{path}{\emph{character, default="data.csv"}   Path to the file to read.}
 }
 \description{
 Reads a file previously writed with \code{\link[=write_tibble]{write_tibble()}} and return a \code{\link[dplyr:reexports]{dplyr::tibble()}} or a list of \code{\link[dplyr:reexports]{dplyr::tibble()}}.
@@ -27,15 +23,13 @@ iris = dplyr::tibble(iris)
 iris$Species = as.character(iris$Species)
 
 # writes a tibble
-write_tibble(iris, filedir="./", filename="iris.txt")
+write_tibble(iris, path="iris.csv")
 # or a list of tibble
 iris_setosa = iris[iris$Species == "setosa",]
 iris_virginica = iris[iris$Species == "virginica",]
 iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
-write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+write_tibble(iris_selection, path="iris_selection.csv")
 
 # read with a path
-read_tibble(filepath="iris.txt")
-# or with a directory and a filename
-read_tibble(filedir="./", filename="iris_selection.txt")
+read_tibble(path="iris.csv")
 }
