@@ -24,8 +24,7 @@
 #' @title write_tibble
 #' @description Writes a [dplyr::tibble()] or a list of [dplyr::tibble()].
 #' @param tbl [dplyr::tibble()] to write.
-#' @param filedir *tibble, default="./"*   Directory to write the file.
-#' @param filename *character, default="data.txt"*   Name of the file to write.
+#' @param path *tibble, default="data.csv"* Path were the file will be writted.
 #' @details This set of [read_tibble()] and [write_tibble()] functions support `.Rdata`, `.txt` and `.fst` format.
 #' @examples
 #' # load data
@@ -35,16 +34,19 @@
 #' iris$Species = as.character(iris$Species)
 #' 
 #' # writes a tibble
-#' write_tibble(iris, filedir="./", filename="iris.txt")
+#' write_tibble(iris, path="iris.csv")
 #' # or a list of tibble
 #' iris_setosa = iris[iris$Species == "setosa",]
 #' iris_virginica = iris[iris$Species == "virginica",]
 #' iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
-#' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+#' write_tibble(iris_selection, path="iris_selection.csv")
 #' @md
 #' @export
-write_tibble = function (tbl, filedir="./", filename="data.txt", quote=TRUE, sep=",") {
+write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
 
+    filename = basename(path)
+    filedir = dirname(path)
+    
     if (!(file.exists(filedir))) {
         dir.create(filedir, recursive=TRUE)
     }
@@ -179,9 +181,7 @@ write_dataFST = function (data, resdir, filedir='fst',
 ## 2. READING ________________________________________________________
 #' @title read_tibble
 #' @description Reads a file previously writed with [write_tibble()] and return a [dplyr::tibble()] or a list of [dplyr::tibble()].
-#' @param filepath *character, default=NULL*   Path to the file to read.
-#' @param filedir *character, default="./"*   Directory to the file to read.
-#' @param filename *character, default="data.txt"*   Name of the file to read.
+#' @param path *character, default="data.csv"*   Path to the file to read.
 #' @details This set of [read_tibble()] and [write_tibble()] functions support `.Rdata`, `.txt` and `.fst` format.
 #' @examples
 #' # load data
@@ -191,39 +191,30 @@ write_dataFST = function (data, resdir, filedir='fst',
 #' iris$Species = as.character(iris$Species)
 #' 
 #' # writes a tibble
-#' write_tibble(iris, filedir="./", filename="iris.txt")
+#' write_tibble(iris, path="iris.csv")
 #' # or a list of tibble
 #' iris_setosa = iris[iris$Species == "setosa",]
 #' iris_virginica = iris[iris$Species == "virginica",]
 #' iris_selection = list(setosa=iris_setosa, virginica=iris_virginica)
-#' write_tibble(iris_selection, filedir="./", filename="iris_selection.txt")
+#' write_tibble(iris_selection, path="iris_selection.csv")
 #' 
 #' # read with a path
-#' read_tibble(filepath="iris.txt")
-#' # or with a directory and a filename
-#' read_tibble(filedir="./", filename="iris_selection.txt")
+#' read_tibble(path="iris.csv")
 #' @md
 #' @export
-read_tibble = function (filepath=NULL,
-                        filedir="./", filename="data.txt", sep=",", ...) {
+read_tibble = function (path="data.csv", sep=",", ...) {
     
-    if (is.null(filepath) & !is.null(filedir) & !is.null(filename)) {
-        filepath = file.path(filedir, filename)
-    } else if (is.null(filepath) & is.null(filedir) & is.null(filename)) {
-        stop ("Neither a filepath nor a filename and a filedir are given")
-    }
+    path_name = gsub("[.].*$", "", basename(path))
+    path_format = gsub("^.*[.]", "", basename(path))
+    path_dir = file.path(dirname(path),
+                         path_name)
 
-    filepath_name = gsub("[.].*$", "", basename(filepath))
-    filepath_format = gsub("^.*[.]", "", basename(filepath))
-    filepath_dir = file.path(dirname(filepath),
-                             filepath_name)
-
-    if (dir.exists(filepath_dir)) {
-        Filepath = list.files(filepath_dir,
-                              full.names=TRUE)
+    if (dir.exists(path_dir)) {
+        Paths = list.files(path_dir,
+                           full.names=TRUE)
         Tbl = list()
-        for (f in Filepath) {
-            tbl = read_tibble(filepath=f)
+        for (f in Paths) {
+            tbl = read_tibble(Paths=f)
             Tbl = append(Tbl, list(tbl))
             names(Tbl)[length(Tbl)] = gsub("[.].*$", "",
                                            basename(f))
@@ -231,22 +222,22 @@ read_tibble = function (filepath=NULL,
         return (Tbl)
         
     } else {
-        format = gsub("^.*[.]", "", basename(filepath))
+        format = gsub("^.*[.]", "", basename(path))
         
         if (format == "fst") {
-            tbl = dplyr::tibble(fst::read_fst(filepath))
+            tbl = dplyr::tibble(fst::read_fst(path))
 
         } else if (format == "rds") {
-            tbl = readRDS(filepath)
+            tbl = readRDS(path)
 
         } else if (format == "Rdata") {
-            tmp = load(filepath)
+            tmp = load(path)
             tbl = get(tmp)
             tbl = as_tibble(tbl)
             rm (tmp)
             
         } else if (format %in% c("csv", "txt")) {
-            tbl = dplyr::as_tibble(read.table(file=filepath,
+            tbl = dplyr::as_tibble(read.table(file=path,
                                               header=TRUE,
                                               sep=sep,
                                               quote='"',
@@ -324,7 +315,7 @@ read_data = function (resdir, filedir, filename, verbose=TRUE) {
         if (all(filename == 'all')) {
             # Create a filelist to store all the filename
             filelist = c()
-             # Get all the filename in the data directory selected
+            # Get all the filename in the data directory selected
             filelist_tmp = list.files(file.path(resdir,
                                                 filedir))
 
@@ -336,7 +327,7 @@ read_data = function (resdir, filedir, filename, verbose=TRUE) {
                     filelist = c(filelist, f) 
                 }
             }
-        # If the filename regroup more than one filename
+            # If the filename regroup more than one filename
         } else if (length(filename > 1)) {
             # The filelist correspond to the filename
             filelist = filename
@@ -350,9 +341,9 @@ read_data = function (resdir, filedir, filename, verbose=TRUE) {
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             data = rbind(data,
-                            read_data(resdir, 
-                                      filedir, 
-                                      f))
+                         read_data(resdir, 
+                                   filedir, 
+                                   f))
         }
         # Set the rownames by default (to avoid strange numbering)
         rownames(data) = NULL
@@ -371,14 +362,14 @@ read_data = function (resdir, filedir, filename, verbose=TRUE) {
     filepath = file.path(resdir, filedir, filename)
     
     if (file.exists(filepath) & substr(filepath, nchar(filepath),
-                                        nchar(filepath)) != '/') {
+                                       nchar(filepath)) != '/') {
         # Extract the data as a data frame
         data = as_tibble(read.table(filepath,
-                                       header=TRUE,
-                                       na.strings=c('NA'),
-                                       sep=';',
-                                       quote='"',
-                                       skip=0))
+                                    header=TRUE,
+                                    na.strings=c('NA'),
+                                    sep=';',
+                                    quote='"',
+                                    skip=0))
 
         for (j in 1:ncol(data)) {
             if (is.factor(data[[j]])) {
