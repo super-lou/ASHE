@@ -81,6 +81,13 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
     }
 }
 
+# tbl = dplyr::tibble(A=letters[1:3], B=1:3)
+# write_tibble(tbl, "data.csv")
+# tbl_list = list(A=dplyr::tibble(A=letters[1:3]),
+                # B=dplyr::tibble(B=1:3))
+# write_tibble(tbl_list, "data_list.csv")
+
+
 ### 1.1. List of dataframe ___________________________________________
 #' @title Write list of dataframe
 #' @export
@@ -260,6 +267,9 @@ read_tibble = function (path="data.csv", sep=",", ...) {
         return (tbl)
     }
 }
+
+# read_tibble("data.csv")
+# read_tibble("data_list.csv")
 
 
 ### 2.1. List of dataframe ___________________________________________
