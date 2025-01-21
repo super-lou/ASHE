@@ -9,7 +9,7 @@ create_data_HYDRO(
   filedir = "",
   filename = "all",
   variable_to_load = c("Qm3s", "Qls", "Qmmj"),
-  val_to_keep = NULL,
+  value_to_keep = NULL,
   format = "HYDRO2",
   verbose = TRUE
 )

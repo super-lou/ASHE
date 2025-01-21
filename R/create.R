@@ -409,6 +409,207 @@ convert_regexp = function (computer_data_path, filedir,
 }
 
 ### 3.1. Creation of metadata ______________________________________
+create_data_HYDRO3_hide = function (path,
+                                    variable_to_load,
+                                    value_to_keep) {
+
+    code = gsub("[_].*", "", basename(path))
+    data = read.table(path,
+                      header=TRUE,
+                      na.strings=c("    -99", " -99.000"),
+                      sep=";",
+                      skip=55)
+    data = dplyr::tibble(data)
+
+    if (!is.null(value_to_keep)) {
+        data = dplyr::mutate(data,
+                             code=code,
+                             date=as.Date(as.character(data$Date),
+                                          format="%Y%m%d"),
+                             Qls=as.numeric(Qls),
+                             Qmmj=as.numeric(Qmmj),
+                             Qm3s=as.numeric(Qls)*1E-3,
+                             !!names(value_to_keep):=
+                                 get(names(value_to_keep)),
+                             .keep="used")
+        Ok = data[[names(value_to_keep)]] != value_to_keep
+        data$Qls[Ok] = NA
+        data$Qmmj[Ok] = NA
+        data$Qm3s[Ok] = NA
+        
+    } else {
+        data = dplyr::mutate(data,
+                             code=code,
+                             date=as.Date(as.character(data$Date),
+                                          format="%Y%m%d"),
+                             Qls=as.numeric(Qls),
+                             Qmmj=as.numeric(Qmmj),
+                             Qm3s=as.numeric(Qls)*1E-3,
+                             .keep="used")
+    }
+
+    data = dplyr::select(data, dplyr::all_of(c("date", "code",
+                                               variable_to_load)))
+    all_na =
+        rowSums(is.na(
+            dplyr::select(data,
+                          dplyr::all_of(variable_to_load)))) ==
+        length(variable_to_load)
+    
+    if (!all(all_na)) {
+        first_non_na = which(!all_na)[1]
+        last_non_na = which(!all_na)[length(which(!all_na))]
+        data = data[first_non_na:last_non_na, ]
+        
+        if (length(variable_to_load) == 1) {
+            data = dplyr::rename(data, Q=dplyr::all_of(variable_to_load))
+        }
+    } else {
+        data = dplyr::tibble()
+    }
+    
+    return (data)
+}
+
+create_meta_HYDRO3_hide = function (path,
+                                    hydrological_region_level) {
+
+    metatxt = c(readLines(path, n=55, encoding="UTF-8"))
+
+    meta =
+        dplyr::tibble(
+                   code=trimws(substr(metatxt[20], 39,
+                                      nchar(metatxt[20]))),
+                   code_site=trimws(substr(metatxt[12], 39,
+                                           nchar(metatxt[12]))),
+                   code_hydro2=trimws(substr(metatxt[24], 39,
+                                             nchar(metatxt[24]))),
+                   name=trimws(substr(metatxt[21], 39,
+                                      nchar(metatxt[21]))),
+                   territory=trimws(substr(metatxt[23], 39,
+                                           nchar(metatxt[23]))),
+                   producer=trimws(substr(metatxt[8], 39,
+                                          nchar(metatxt[8]))),
+
+                   XL93_m=as.numeric(substr(metatxt[27], 39, 47)),
+                   YL93_m=as.numeric(substr(metatxt[27], 50, 59)),
+                   XL2_m=as.numeric(substr(metatxt[28], 39, 47)),
+                   YL2_m=as.numeric(substr(metatxt[28], 50, 59)),
+                   lon_deg=as.numeric(substr(metatxt[29], 39, 47)),
+                   lat_deg=as.numeric(substr(metatxt[29], 50, 59)),
+
+                   surface_km2=as.numeric(substr(metatxt[30], 39, 47)),
+                   elevation_m=as.numeric(substr(metatxt[31], 39, 47)),
+
+                   start=as.Date(substr(metatxt[41], 39, 48)),
+                   end=as.Date(substr(metatxt[41], 52, 61)),
+
+                   gap_pct=as.numeric(substr(metatxt[42], 39, 45)),
+                   
+                   creation_date=Sys.Date(),
+                   creation_date_origin=as.Date(trimws(substr(metatxt[2], 39,
+                                                              nchar(metatxt[2])))),
+                   path=path)
+    
+    meta$surface_km2[(meta$surface_km2) <= 0] = NA
+    # meta$elevation_m[(meta$elevation_m) < 0] = NA
+
+    Ltmp = names(iRegHydro())[nchar(names(iRegHydro())) == 2]
+    Ltmp = substr(Ltmp, 1, 1)
+    infoSecteur = rle(sort(Ltmp))$values
+    
+    oneL = substr(meta$code, 1, 1)
+    twoL = substr(meta$code, 1, 2)
+    RH = c()
+    for (i in 1:length(oneL)) {
+        if (oneL[i] %in% infoSecteur & hydrological_region_level == 2) {
+            RHtmp = iRegHydro()[twoL[i]]
+        } else {
+            RHtmp = iRegHydro()[oneL[i]]
+        }
+        RH = c(RH, RHtmp)
+    }
+    
+    meta$hydrological_region = RH
+    meta = dplyr::relocate(meta, hydrological_region, .before=territory)
+
+    return (meta)
+}
+
+#' @title create_data_HYDRO3
+#' @export
+create_data_HYDRO3 = function (paths,
+                               variable_to_load=c("Qm3s", "Qls", "Qmmj"),
+                               value_to_keep=NULL) {
+    data = lapply(paths,
+                  create_data_HYDRO3_hide,
+                  variable_to_load=variable_to_load,
+                  value_to_keep=value_to_keep)
+    data = purrr::reduce(.x=data,
+                         .f=dplyr::bind_rows)
+    return (data)
+}
+
+#' @title create_meta_HYDRO3
+#' @export
+create_meta_HYDRO3 = function (paths,
+                               hydrological_region_level=1) {
+    meta = lapply(paths,
+                  create_meta_HYDRO3_hide,
+                  hydrological_region_level=hydrological_region_level)
+    meta = purrr::reduce(.x=meta,
+                         .f=dplyr::bind_rows)
+    return (meta)
+}
+
+#' @title create_HYDRO3
+#' @export
+create_HYDRO3 = function (paths,
+                          variable_to_load=c("Qm3s", "Qls", "Qmmj"),
+                          value_to_keep=NULL,
+                          hydrological_region_level=1) {
+    
+    data = create_data_HYDRO3(paths,
+                              variable_to_load=variable_to_load,
+                              value_to_keep=value_to_keep)
+    meta = create_meta_HYDRO3(paths,
+                              hydrological_region_level=hydrological_region_level)
+
+    if (length(variable_to_load) == 1) {
+        variable_to_load = "Q"
+    }
+
+    stat = dplyr::summarise(dplyr::group_by(data, code),
+                            start_adjust=min(date),
+                            end_adjust=max(date),
+                            dplyr::across(dplyr::all_of(variable_to_load),
+                                          ~sum(is.na(.x))/dplyr::n()*100,
+                                          .names="gap_{.col}_adjust_pct"))
+
+    meta = dplyr::full_join(meta, stat, by="code")
+    meta = dplyr::relocate(meta, start_adjust, .after=start)
+    meta = dplyr::relocate(meta, end_adjust, .after=end)
+    meta = dplyr::relocate(meta, dplyr::ends_with("_adjust_pct"),
+                           .after=gap_pct)
+    
+    res = list(data=data, meta=meta)
+    return (res)
+}
+
+# dirpath = "/home/lheraut/Documents/INRAE/data/HYDRO/2024-09-XX/RRSE"
+# Paths = list.files(dirpath, pattern=".txt", full.names=TRUE)
+# path = Paths[1]
+# paths = Paths[1:3]
+# value_to_keep = NULL #c(Val_I=1)
+# variable_to_load = "Qm3s" # c("Qm3s", "Qls", "Qmmj")
+# hydrological_region_level = 1
+# data=create_data_HYDRO3_hide(path, variable_to_load, value_to_keep)
+# meta=create_meta_HYDRO3_hide(path, hydrological_region_level)
+
+# res = create_HYDRO3(Paths[1:3], variable_to_load, value_to_keep, hydrological_region_level)
+
+
+
 #' @title Create metadata
 #' @description Creation of metadata of stations.
 #' @param computer_data_path Path to the data.
@@ -595,7 +796,7 @@ create_data_HYDRO = function (computer_data_path,
                               filedir="",
                               filename="all",
                               variable_to_load=c("Qm3s", "Qls", "Qmmj"),
-                              val_to_keep=NULL,
+                              value_to_keep=NULL,
                               format="HYDRO2",
                               verbose=TRUE) {
     
@@ -650,7 +851,7 @@ create_data_HYDRO = function (computer_data_path,
                                            filedir=filedir, 
                                            filename=f,
                                            variable_to_load=variable_to_load,
-                                           val_to_keep=val_to_keep,
+                                           value_to_keep=value_to_keep,
                                            format=format,
                                            verbose=FALSE))
         }
@@ -701,7 +902,7 @@ create_data_HYDRO = function (computer_data_path,
             }
         }
 
-        if (!is.null(val_to_keep)) {
+        if (!is.null(value_to_keep)) {
             data = dplyr::mutate(data,
                                  code=code,
                                  date=as.Date(as.character(data$Date),
@@ -709,21 +910,21 @@ create_data_HYDRO = function (computer_data_path,
                                  Qls=as.numeric(Qls),
                                  Qmmj=as.numeric(Qmmj),
                                  Qm3s=as.numeric(Qls)*1E-3,
-                                 !!names(val_to_keep):=
-                                     get(names(val_to_keep)),
+                                 !!names(value_to_keep):=
+                                     get(names(value_to_keep)),
                                  .keep="used")
             data = dplyr::select(data, dplyr::all_of(c("date",
                                                        "code",
                                                        variable_to_load,
-                                                       names(val_to_keep))))
+                                                       names(value_to_keep))))
             
-            isNA = data[[names(val_to_keep)]] != val_to_keep | is.na(data$Q)
+            isNA = data[[names(value_to_keep)]] != value_to_keep | is.na(data$Q)
             isNArle = rle(isNA)
             isNArle = isNArle$lengths*isNArle$values
             N = nrow(data)
             data = data[(isNArle[1]+1):(N-isNArle[length(isNArle)]),]
-            data$Q[data[[names(val_to_keep)]] != val_to_keep] = NA
-            data = dplyr::select(data, -names(val_to_keep))
+            data$Q[data[[names(value_to_keep)]] != value_to_keep] = NA
+            data = dplyr::select(data, -names(value_to_keep))
             
         } else {
             data = dplyr::mutate(data,
