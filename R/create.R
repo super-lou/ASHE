@@ -409,10 +409,15 @@ convert_regexp = function (computer_data_path, filedir,
 }
 
 ### 3.1. Creation of metadata ______________________________________
-create_data_HYDRO3_hide = function (path,
+create_data_HYDRO3_hide = function (i, paths,
                                     variable_to_load,
-                                    value_to_keep) {
-
+                                    value_to_keep,
+                                    verbose) {
+    path = paths[i]
+    if (verbose) {
+        print(paste0(i, " -> ", round(i/length(paths)*100, 1), "%"))
+    }
+    
     code = gsub("[_].*", "", basename(path))
     data = read.table(path,
                       header=TRUE,
@@ -471,9 +476,15 @@ create_data_HYDRO3_hide = function (path,
     return (data)
 }
 
-create_meta_HYDRO3_hide = function (path,
-                                    hydrological_region_level) {
+create_meta_HYDRO3_hide = function (i, paths,
+                                    hydrological_region_level,
+                                    verbose) {
 
+    path = paths[i]
+    if (verbose) {
+        print(paste0(i, " -> ", round(i/length(paths)*100, 1), "%"))
+    }
+    
     metatxt = c(readLines(path, n=55, encoding="UTF-8"))
 
     meta =
@@ -540,11 +551,14 @@ create_meta_HYDRO3_hide = function (path,
 #' @export
 create_data_HYDRO3 = function (paths,
                                variable_to_load=c("Qm3s", "Qls", "Qmmj"),
-                               value_to_keep=NULL) {
-    data = lapply(paths,
+                               value_to_keep=NULL,
+                               verbose=FALSE) {
+    data = lapply(1:length(paths),
                   create_data_HYDRO3_hide,
+                  paths=paths,
                   variable_to_load=variable_to_load,
-                  value_to_keep=value_to_keep)
+                  value_to_keep=value_to_keep,
+                  verbose=verbose)
     data = purrr::reduce(.x=data,
                          .f=dplyr::bind_rows)
     return (data)
@@ -553,10 +567,13 @@ create_data_HYDRO3 = function (paths,
 #' @title create_meta_HYDRO3
 #' @export
 create_meta_HYDRO3 = function (paths,
-                               hydrological_region_level=1) {
-    meta = lapply(paths,
+                               hydrological_region_level=1,
+                               verbose=FALSE) {
+    meta = lapply(1:length(paths),
                   create_meta_HYDRO3_hide,
-                  hydrological_region_level=hydrological_region_level)
+                  paths=paths,
+                  hydrological_region_level=hydrological_region_level,
+                  verbose=verbose)
     meta = purrr::reduce(.x=meta,
                          .f=dplyr::bind_rows)
     return (meta)
@@ -567,13 +584,16 @@ create_meta_HYDRO3 = function (paths,
 create_HYDRO3 = function (paths,
                           variable_to_load=c("Qm3s", "Qls", "Qmmj"),
                           value_to_keep=NULL,
-                          hydrological_region_level=1) {
+                          hydrological_region_level=1,
+                          verbose=FALSE) {
     
     data = create_data_HYDRO3(paths,
                               variable_to_load=variable_to_load,
-                              value_to_keep=value_to_keep)
+                              value_to_keep=value_to_keep,
+                              verbose=verbose)
     meta = create_meta_HYDRO3(paths,
-                              hydrological_region_level=hydrological_region_level)
+                              hydrological_region_level=hydrological_region_level,
+                              verbose=verbose)
 
     if (length(variable_to_load) == 1) {
         variable_to_load = "Q"
