@@ -586,11 +586,13 @@ create_HYDRO3 = function (paths,
                           value_to_keep=NULL,
                           hydrological_region_level=1,
                           verbose=FALSE) {
-    
+
+    if (verbose) print("--- CREATE DATA ---")
     data = create_data_HYDRO3(paths,
                               variable_to_load=variable_to_load,
                               value_to_keep=value_to_keep,
                               verbose=verbose)
+    if (verbose) print("--- CREATE META ---")
     meta = create_meta_HYDRO3(paths,
                               hydrological_region_level=hydrological_region_level,
                               verbose=verbose)
