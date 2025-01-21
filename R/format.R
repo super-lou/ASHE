@@ -20,6 +20,16 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#' @title clean_path
+#' @export
+clean_path = function (text) {
+    text = iconv(text, from = "UTF-8", to = "ASCII//TRANSLIT")
+    text = gsub("[()]", "", text)
+    return (text)
+}
+
+
 ## 1. FORMATTING OF DATA _____________________________________________
 ### 1.1. Joining selection ___________________________________________
 # Joins tibbles of different selection of station as a unique one

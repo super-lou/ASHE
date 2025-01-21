@@ -241,7 +241,7 @@ read_tibble = function (path="data.csv", sep=",", ...) {
             tbl = get(tmp)
             tbl = as_tibble(tbl)
             rm (tmp)
-            
+
         } else if (format %in% c("csv", "txt")) {
             tbl = dplyr::as_tibble(read.table(file=path,
                                               header=TRUE,

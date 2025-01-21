@@ -2,6 +2,7 @@
 
 export(add_critique)
 export(add_mod)
+export(clean_path)
 export(convert_regexp)
 export(copy_selection)
 export(create_climate_data)
