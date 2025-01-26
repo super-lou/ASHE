@@ -163,7 +163,7 @@ iRegHydro = function () {
       '4'='Réunion')
 }
 
-    
+
 ## 2. SELECTION ______________________________________________________
 ### 2.0. Copy a selection of station _________________________________
 #' @title Copy a selection of station
@@ -177,8 +177,8 @@ copy_selection = function (select_dir, select_file, from_dir, to_dir,
     # Creates it if it does not exist
     if (!(file.exists(to_dir))) {
         dir.create(to_dir, recursive=TRUE)
-    # If it already exists it deletes the pre-existent directory
-    # and recreates one
+        # If it already exists it deletes the pre-existent directory
+        # and recreates one
     } else {
         unlink(to_dir, recursive=TRUE)
         dir.create(to_dir)
@@ -257,13 +257,13 @@ create_selection = function (computer_data_path, filedir, outname,
     # For all the filename in the file list
     for (f in filelist_tmp) {
         # If the filename is a 'txt' file
-            if (tools::file_ext(f) == 'txt') {
-                # Creates the station code
-                code = gsub("[^[:alnum:] ].*$", '', f)
-                # Then the station code is stored
-                codelist = c(codelist, code)
-            }
-        }  
+        if (tools::file_ext(f) == 'txt') {
+            # Creates the station code
+            code = gsub("[^[:alnum:] ].*$", '', f)
+            # Then the station code is stored
+            codelist = c(codelist, code)
+        }
+    }  
     # Create a tibble to store the data to write
     filename = paste(codelist, optname, '.txt', sep='')
     # Write the data in a txt file
@@ -305,9 +305,9 @@ get_selection_TXT = function (computer_data_path, listdir, listname) {
 }
 # Example
 # df_selec_TXT = get_selection_TXT(
-    # "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/ASHE/data",
-    # "",
-    # "selection.txt")
+# "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/ASHE/data",
+# "",
+# "selection.txt")
 
 ### 2.3. Agence de l'eau Adour-Garonne selection _____________________
 #' @title Get selection of a '.docx' file
@@ -373,9 +373,9 @@ get_selection_DOCX = function (computer_data_path, listdir, listname,
 }
 # Example
 # df_selec_DOCX = get_selection_DOCX(
-    # "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/ASHE/data",
-    # "",
-    # "Liste-station_RRSE.docx")
+# "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/ASHE/data",
+# "",
+# "Liste-station_RRSE.docx")
 
 
 ## 3. CREATEION _____________________________________________________
@@ -421,7 +421,7 @@ create_data_HYDRO3_hide = function (i, paths,
     code = gsub("[_].*", "", basename(path))
     data = read.table(path,
                       header=TRUE,
-                      na.strings=c("    -99", " -99.000"),
+                      na.strings=c("     -99", " -99.000"),
                       sep=";",
                       skip=55)
     data = dplyr::tibble(data)
@@ -618,17 +618,19 @@ create_HYDRO3 = function (paths,
     return (res)
 }
 
-# dirpath = "/home/lheraut/Documents/INRAE/data/HYDRO/2024-09-XX/RRSE"
-# Paths = list.files(dirpath, pattern=".txt", full.names=TRUE)
-# path = Paths[1]
-# paths = Paths[1:3]
-# value_to_keep = NULL #c(Val_I=1)
-# variable_to_load = "Qm3s" # c("Qm3s", "Qls", "Qmmj")
-# hydrological_region_level = 1
-# data=create_data_HYDRO3_hide(path, variable_to_load, value_to_keep)
-# meta=create_meta_HYDRO3_hide(path, hydrological_region_level)
+dirpath = "/home/lheraut/Documents/INRAE/data/HYDRO/2024-09-XX/RRSE"
+Paths = list.files(dirpath, pattern=".txt", full.names=TRUE)
+value_to_keep = NULL #c(Val_I=1)
+variable_to_load = "Qm3s" # c("Qm3s", "Qls", "Qmmj")
+hydrological_region_level = 1
 
-# res = create_HYDRO3(Paths[1:3], variable_to_load, value_to_keep, hydrological_region_level)
+path = Paths[grepl("J421451001", Paths)]
+
+data = create_data_HYDRO3(path, variable_to_load, value_to_keep)
+meta = create_meta_HYDRO3(path, hydrological_region_level)
+
+res = create_HYDRO3(path, variable_to_load, value_to_keep, hydrological_region_level)
+
 
 
 
@@ -645,9 +647,9 @@ create_HYDRO3 = function (paths,
 #' printed (default : TRUE).
 #' @return A tibble containing metadata about selected stations.
 #' @export
-create_meta_HYDRO = function (computer_data_path, filedir, filename,
-                              hydrological_region_level=1,
-                              verbose=TRUE) {
+create_meta_HYDRO2 = function (computer_data_path, filedir, filename,
+                               hydrological_region_level=1,
+                               verbose=TRUE) {
     
     # Convert the filename in vector
     filename = c(filename)
@@ -677,7 +679,7 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
                     filelist = c(filelist, f) 
                 }
             }
-        # If the filename regroup more than one filename
+            # If the filename regroup more than one filename
         } else if (length(filename > 1)) {
             # The filelist correspond to the filename
             filelist = filename
@@ -691,10 +693,10 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             meta = rbind(meta,
-                            create_meta_HYDRO(computer_data_path, 
-                                         filedir, 
-                                         f,
-                                         verbose=FALSE))
+                         create_meta_HYDRO2(computer_data_path, 
+                                            filedir, 
+                                            f,
+                                            verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
         rownames(meta) = NULL
@@ -721,48 +723,48 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
         # (IN for INRAE data and BH for BH data)
         meta =
             dplyr::tibble(
-                # Station code
-                code=trimws(substr(metatxt[11], 38,
-                                   nchar(metatxt[11]))),
-                # Station name
-                name=trimws(substr(metatxt[12], 39,
-                                  nchar(metatxt[12]))),
-                # Territory
-                territoire=trimws(substr(metatxt[13], 39,
-                                         nchar(metatxt[13]))),
-                # Administrator
-                gestionnaire=trimws(substr(metatxt[7], 60,
-                                           nchar(metatxt[7]))),
-                # Lambert 93 localisation
-                # L93X_m_IN=as.numeric(substr(metatxt[16], 65, 77)),
-                XL93_m=as.numeric(substr(metatxt[16], 38, 50)),
-                # L93Y_m_IN=as.numeric(substr(metatxt[16], 79, 90)),
-                YL93_m=as.numeric(substr(metatxt[16], 52, 63)),
+                       # Station code
+                       code=trimws(substr(metatxt[11], 38,
+                                          nchar(metatxt[11]))),
+                       # Station name
+                       name=trimws(substr(metatxt[12], 39,
+                                          nchar(metatxt[12]))),
+                       # Territory
+                       territoire=trimws(substr(metatxt[13], 39,
+                                                nchar(metatxt[13]))),
+                       # Administrator
+                       gestionnaire=trimws(substr(metatxt[7], 60,
+                                                  nchar(metatxt[7]))),
+                       # Lambert 93 localisation
+                       # L93X_m_IN=as.numeric(substr(metatxt[16], 65, 77)),
+                       XL93_m=as.numeric(substr(metatxt[16], 38, 50)),
+                       # L93Y_m_IN=as.numeric(substr(metatxt[16], 79, 90)),
+                       YL93_m=as.numeric(substr(metatxt[16], 52, 63)),
 
-                # Surface
-                # surface_km2_IN=as.numeric(substr(metatxt[19], 52, 63)),
-                surface_km2=as.numeric(substr(metatxt[19], 38, 50)),
+                       # Surface
+                       # surface_km2_IN=as.numeric(substr(metatxt[19], 52, 63)),
+                       surface_km2=as.numeric(substr(metatxt[19], 38, 50)),
 
-                # Elevation
-                # altitude_m_IN=as.numeric(substr(metatxt[20], 52, 63)),
-                altitude_m=as.numeric(substr(metatxt[20], 38, 50)),
+                       # Elevation
+                       # altitude_m_IN=as.numeric(substr(metatxt[20], 52, 63)),
+                       altitude_m=as.numeric(substr(metatxt[20], 38, 50)),
 
-                # Start and end of the data
-                debut=substr(metatxt[25], 38, 50),
-                fin=substr(metatxt[25], 52, 63),
+                       # Start and end of the data
+                       debut=substr(metatxt[25], 38, 50),
+                       fin=substr(metatxt[25], 52, 63),
 
-                # Different other info about the flow quality and type
-                statut=iStatut()[trimws(substr(metatxt[26], 38, 50))],
-                finalite=iFinalite()[trimws(substr(metatxt[26], 52, 56))],
-                type=iType()[trimws(substr(metatxt[26], 58, 58))],
-                influence=iInfluence()[trimws(substr(metatxt[26], 60, 60))],
-                debit=iDebit()[trimws(substr(metatxt[26], 62, 62))],
-                QBE=iQBE()[trimws(substr(metatxt[26], 72, 72))],
-                QME=iQME()[trimws(substr(metatxt[26], 74, 74))],
-                QHE=iQHE()[trimws(substr(metatxt[26], 76, 76))],
+                       # Different other info about the flow quality and type
+                       statut=iStatut()[trimws(substr(metatxt[26], 38, 50))],
+                       finalite=iFinalite()[trimws(substr(metatxt[26], 52, 56))],
+                       type=iType()[trimws(substr(metatxt[26], 58, 58))],
+                       influence=iInfluence()[trimws(substr(metatxt[26], 60, 60))],
+                       debit=iDebit()[trimws(substr(metatxt[26], 62, 62))],
+                       QBE=iQBE()[trimws(substr(metatxt[26], 72, 72))],
+                       QME=iQME()[trimws(substr(metatxt[26], 74, 74))],
+                       QHE=iQHE()[trimws(substr(metatxt[26], 76, 76))],
 
-                # The path to the data file of BH
-                file_path=file_path)
+                       # The path to the data file of BH
+                       file_path=file_path)
         
         meta$surface_km2[(meta$surface_km2) <= 0] = NA
         # meta$surface_km2_IN[(meta$surface_km2_BH) <= 0] = NA
@@ -795,7 +797,7 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
     }
 }
 # Example
-# meta = create_meta_HYDRO(
+# meta = create_meta_HYDRO2(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     "BanqueHydro_Export2021",
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
@@ -814,20 +816,20 @@ create_meta_HYDRO = function (computer_data_path, filedir, filename,
 #' printed (default : TRUE).
 #' @return A tibble containing data about selected stations.
 #' @export
-create_data_HYDRO = function (computer_data_path,
-                              filedir="",
-                              filename="all",
-                              variable_to_load=c("Qm3s", "Qls", "Qmmj"),
-                              value_to_keep=NULL,
-                              format="HYDRO2",
-                              verbose=TRUE) {
+create_data_HYDRO2 = function (computer_data_path,
+                               filedir="",
+                               filename="all",
+                               variable_to_load=c("Qm3s", "Qls", "Qmmj"),
+                               value_to_keep=NULL,
+                               format="HYDRO2",
+                               verbose=TRUE) {
     
     # Convert the filename in vector
     filename = c(filename)
 
     if (format == "HYDRO2") {
         skip = 41
-    } else if (format == "HYDRO3") {
+    } else if (format == "HYDRO") {
         skip = 55
     }
 
@@ -843,7 +845,7 @@ create_data_HYDRO = function (computer_data_path,
         if (all(filename == 'all')) {
             # Create a filelist to store all the filename
             filelist = c()
-             # Get all the filename in the data directory selected
+            # Get all the filename in the data directory selected
             filelist_tmp = list.files(file.path(computer_data_path,
                                                 filedir))
 
@@ -855,7 +857,7 @@ create_data_HYDRO = function (computer_data_path,
                     filelist = c(filelist, f) 
                 }
             }
-        # If the filename regroup more than one filename
+            # If the filename regroup more than one filename
         } else if (length(filename > 1)) {
             # The filelist correspond to the filename
             filelist = filename
@@ -869,13 +871,13 @@ create_data_HYDRO = function (computer_data_path,
             # Concatenate by raw data frames created by this function
             # when filename correspond to only one filename
             data = rbind(data,
-                         create_data_HYDRO(computer_data_path=computer_data_path, 
-                                           filedir=filedir, 
-                                           filename=f,
-                                           variable_to_load=variable_to_load,
-                                           value_to_keep=value_to_keep,
-                                           format=format,
-                                           verbose=FALSE))
+                         create_data_HYDRO2(computer_data_path=computer_data_path, 
+                                            filedir=filedir, 
+                                            filename=f,
+                                            variable_to_load=variable_to_load,
+                                            value_to_keep=value_to_keep,
+                                            format=format,
+                                            verbose=FALSE))
         }
         # Set the rownames by default (to avoid strange numbering)
         rownames(data) = NULL
@@ -904,14 +906,14 @@ create_data_HYDRO = function (computer_data_path,
 
         # Create all the metadata for the station
         # meta = create_meta_HYDRO(computer_data_path, filedir, filename,
-                               # verbose=FALSE)
+        # verbose=FALSE)
         # Get the code of the station
         # code = meta$code
 
         metatxt = c(readLines(file_path, n=skip, encoding="UTF-8"))
         if (format == "HYDRO2") {
             code = trimws(substr(metatxt[11], 38, nchar(metatxt[11])))
-        } else if (format == "HYDRO3") {
+        } else if (format == "HYDRO") {
             code = trimws(substr(metatxt[20], 38, nchar(metatxt[20])))
         }
 
@@ -973,7 +975,7 @@ create_data_HYDRO = function (computer_data_path,
     }
 }
 # Example
-# data = create_data_HYDRO(
+# data = create_data_HYDRO2(
 #     "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
 #     '',
 #     c('H5920011_HYDRO_QJM.txt', 'K4470010_HYDRO_QJM.txt'))
@@ -1027,5 +1029,5 @@ create_climate_data = function (computer_data_path, filedir,
 }
 # Example
 # res = create_climate_data(
-    # "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
-    # 'climate')
+# "/home/louis/Documents/bouleau/INRAE/CDD_stationnarite/data",
+# 'climate')
