@@ -1,6 +1,6 @@
 Package: ASHE
-Version: 0.0.2
-Date: 2023-03-27
+Version: 0.0.3
+Date: 2025-01-27
 Title: ASHE
 Description: ASHE (Analysis and Statistics for Hydrology and Environment) is a messy package that gathers various useful tools (at least for me) for hydrological and environmental statistical analysis in R.
 Author: Louis Héraut <louis.heraut@inrae.fr>
