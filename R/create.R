@@ -618,20 +618,15 @@ create_HYDRO3 = function (paths,
     return (res)
 }
 
-dirpath = "/home/lheraut/Documents/INRAE/data/HYDRO/2024-09-XX/RRSE"
-Paths = list.files(dirpath, pattern=".txt", full.names=TRUE)
-value_to_keep = NULL #c(Val_I=1)
-variable_to_load = "Qm3s" # c("Qm3s", "Qls", "Qmmj")
-hydrological_region_level = 1
-
-path = Paths[grepl("J421451001", Paths)]
-
-data = create_data_HYDRO3(path, variable_to_load, value_to_keep)
-meta = create_meta_HYDRO3(path, hydrological_region_level)
-
-res = create_HYDRO3(path, variable_to_load, value_to_keep, hydrological_region_level)
-
-
+# dirpath = "/home/lheraut/Documents/INRAE/data/HYDRO/2024-09-XX/RRSE"
+# Paths = list.files(dirpath, pattern=".txt", full.names=TRUE)
+# value_to_keep = NULL #c(Val_I=1)
+# variable_to_load = "Qm3s" # c("Qm3s", "Qls", "Qmmj")
+# hydrological_region_level = 1
+# path = Paths[grepl("J421451001", Paths)]
+# data = create_data_HYDRO3(path, variable_to_load, value_to_keep)
+# meta = create_meta_HYDRO3(path, hydrological_region_level)
+# res = create_HYDRO3(path, variable_to_load, value_to_keep, hydrological_region_level)
 
 
 #' @title Create metadata
