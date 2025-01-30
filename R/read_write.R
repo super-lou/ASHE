@@ -65,6 +65,10 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
         }
 
     } else {
+        if (any(sapply(tbl, is.list))) {
+            tbl = flatten_tibble(tbl)
+        }
+        
         if (format == "fst") {
             fst::write_fst(tbl, filepath, compress=100)
 
@@ -86,6 +90,22 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
 # tbl_list = list(A=dplyr::tibble(A=letters[1:3]),
                 # B=dplyr::tibble(B=1:3))
 # write_tibble(tbl_list, "data_list.csv")
+
+
+flatten_tibble = function (tbl, delimiter = "; ") {
+    tbl = dplyr::mutate(tbl,
+                        dplyr::across(dplyr::everything(), ~ {
+                            if (is.list(.x)) {
+                                sapply(.x, function(y) {
+                                    paste(unlist(y), collapse=delimiter)
+                                })
+                            } else {
+                                .x
+                            }
+                        }))
+    return (tbl)
+}
+
 
 
 ### 1.1. List of dataframe ___________________________________________
