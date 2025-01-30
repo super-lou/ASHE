@@ -76,11 +76,12 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
             save(tbl, file=filepath)
             
         } else if (format %in% c("csv", "txt")) {
-            write.table(tbl,
-                        file=filepath,
-                        sep=sep,
-                        quote=quote,
-                        row.names=FALSE)
+            # write.table(tbl,
+            #             file=filepath,
+            #             sep=sep,
+            #             quote=quote,
+            #             row.names=FALSE)
+            write.csv(tbl, file=filepath)
         }
     }
 }
@@ -263,11 +264,13 @@ read_tibble = function (path="data.csv", sep=",", ...) {
             rm (tmp)
 
         } else if (format %in% c("csv", "txt")) {
-            tbl = dplyr::as_tibble(read.table(file=path,
-                                              header=TRUE,
-                                              sep=sep,
-                                              quote='"',
-                                              ...))
+            # tbl = dplyr::as_tibble(read.table(file=path,
+            #                                   header=TRUE,
+            #                                   sep=sep,
+            #                                   quote='"',
+            #                                   ...))
+            tbl = dplyr::as_tibble(read.csv(file=path))
+            
             for (j in 1:ncol(tbl)) {
                 if (is.factor(tbl[[j]])) {
                     d = try(as.Date(tbl[[1, j]],
