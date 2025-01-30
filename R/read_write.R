@@ -81,7 +81,8 @@ write_tibble = function (tbl, path="data.csv", quote=TRUE, sep=",") {
             #             sep=sep,
             #             quote=quote,
             #             row.names=FALSE)
-            write.csv(tbl, file=filepath)
+            write.csv(tbl, file=filepath,
+                      row.names=FALSE)
         }
     }
 }
