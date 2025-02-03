@@ -467,3 +467,11 @@ read_shp = function (path) {
     shp = st_transform(shp, 2154) 
     return (shp)
 }
+
+#' @title clean_path
+#' @export
+clean_path = function (text) {
+    text = iconv(text, from = "UTF-8", to = "ASCII//TRANSLIT")
+    text = gsub("[()]", "", text)
+    return (text)
+}
