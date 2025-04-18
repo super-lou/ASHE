@@ -230,7 +230,7 @@ write_dataFST = function (data, resdir, filedir='fst',
 #' read_tibble(path="iris.csv")
 #' @md
 #' @export
-read_tibble = function (path="data.csv", sep=",", ...) {
+read_tibble = function (path="data.csv", ...) {
     
     path_name = gsub("[.].*$", "", basename(path))
     path_format = gsub("^.*[.]", "", basename(path))
@@ -270,7 +270,7 @@ read_tibble = function (path="data.csv", sep=",", ...) {
             #                                   sep=sep,
             #                                   quote='"',
             #                                   ...))
-            tbl = dplyr::as_tibble(read.csv(file=path))
+            tbl = dplyr::as_tibble(read.csv(file=path, ...))
             
             for (j in 1:ncol(tbl)) {
                 if (is.factor(tbl[[j]])) {
