@@ -44,7 +44,7 @@ If you want to try by yourself, why not start by also [opening an issue](https:/
 - Push to your fork and verify everything works as expected
 - Open a Pull Request on GitHub and describe what you did and why
 - Wait for review
-- For future development, keep your fork updated using the GitHub “Sync fork” functionality, by pulling changes from the original repo, or via `remote upstream` if you're comfortable with Git. Otherwise, feel free to delete your fork to keep things tidy ! 
+- For future development, keep your fork updated using the GitHub “Sync fork” functionality or by pulling changes from the original repo (or even via remote upstream if you're comfortable with Git). Otherwise, feel free to delete your fork to keep things tidy ! 
 
 If we’re connected through work, why not reach out via [email](mailto:louis.heraut@inrae.fr) to see if we can collaborate more closely on this repo by adding you as a collaborator !
 
